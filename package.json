@@ -1,0 +1,52 @@
+{
+  "name": "server_ts",
+  "version": "1.0.0",
+  "main": "/src/server.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon --watch src -e ts --exec ts-node src/server.ts",
+    "build": "rm -rf dist & cross-env NODE_ENV=production webpack",
+    "build:tsc": "rm -rf dist & cross-env NODE_ENV=production tsc",
+    "start": "nodemon dist/server.js"
+  },
+  "dependencies": {
+    "@koa/cors": "^3.1.0",
+    "@koa/router": "^10.0.0",
+    "axios": "^0.25.0",
+    "chalk": "^2.4.1",
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.13.1",
+    "koa-bodyparser": "^4.3.0",
+    "koa-static": "^5.0.0",
+    "koa2-proxy-middleware": "0.0.4",
+    "logger": "^0.0.1",
+    "mime": "^2.5.2",
+    "module-alias": "^2.2.2",
+    "mysql2": "^2.2.5",
+    "nodemailer": "^6.6.3",
+    "nodemon": "^2.0.7",
+    "socket.io": "^4.2.0",
+    "webpack-node-externals": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^8.5.4",
+    "@types/koa": "^2.13.1",
+    "@types/koa-bodyparser": "^4.3.0",
+    "@types/koa-static": "^4.0.1",
+    "@types/koa__cors": "^3.0.2",
+    "@types/koa__router": "^8.0.4",
+    "@types/mime": "^2.0.3",
+    "@types/module-alias": "^2.0.1",
+    "@types/node": "^14.14.37",
+    "cross-env": "^7.0.3",
+    "ts-loader": "^9.2.6",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.2.3",
+    "webpack": "^5.66.0",
+    "webpack-cli": "^4.9.1"
+  },
+  "_moduleAliases": {},
+  "_moduleDirectories": [
+    "node_modules_custom"
+  ]
+}

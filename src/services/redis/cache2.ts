@@ -1,0 +1,105 @@
+import { createNum } from '@/utils/number';
+
+export type Key = string | symbol
+export type Value = any
+export type OverTime = any
+export type Count = number
+
+const data = Symbol('data');  // 私有属性，禁止导出
+const iter = createNum();  // 数字生成器
+
+const cache = {
+  [data]: new Map(),
+
+  /**
+   * 设置缓存数据
+   * @param {string | symbol} key 如果不想覆盖此属性，请将 key 设置为 Symbol 类型
+   * @param {*} value 
+   * @param {number} overTime 过期时间，单位（ms）
+   */
+  set(key: Key, value: Value, overTime: OverTime) {
+    if (key === null || key === undefined || key === '') return;
+    this[data].set(key, {
+      createTime: Date.now(),
+      value,
+      overTime: overTime,
+      count: iter.next().value,  // 同一毫秒内可能存很多数据，记录一个索引，越小则证明存放时间越早
+    })
+  },
+
+  /**
+   * 获取数据
+   * @param key 给我一个 key 值
+   * @returns 
+   */
+  get(key: Key) {
+    const value = this[data].get(key);
+    if (value == null) return;
+
+    const time = Date.now();
+    (time - value.createTime > value.overTime) && this.delete(key);
+    const newValue = this[data].get(key);
+    return newValue && newValue.value;
+  },
+
+  // 删除数据
+  delete(key: Key) {
+    this[data].delete(key);
+  },
+
+  // 清空所有数据
+  clear() {
+    this[data].clear();
+  },
+
+  // data.length
+  length() {
+    return this[data].size;
+  },
+
+  // 获取所有缓存数据
+  gainAll() {
+    return Object.fromEntries(this[data].entries());
+  },
+
+  // 获取数据字节大小
+  size() {
+    return getLSUsedSpace(this.gainAll());
+  },
+
+}
+
+/**
+ * 获取一个对象的字节大小
+ * @param obj 
+ * @returns 
+ */
+ export function getLSUsedSpace(obj: any) {
+
+  const length = Object.keys(obj).reduce((total, curKey) => {
+    if (!obj.hasOwnProperty(curKey)) return total;
+
+    if (typeof obj[curKey] === 'string') total += obj[curKey].length + curKey.length;
+    else total += JSON.stringify(obj[curKey]).replace(/"/g, '').length + curKey.length;
+
+    return total;
+  }, 0);
+
+  const symbolLen = Object.getOwnPropertySymbols(obj).reduce((total, curKey) => {
+    if (!obj.hasOwnProperty(curKey)) return total;
+
+    if (typeof obj[curKey] === 'string') total += obj[curKey].length;
+    else total += JSON.stringify(obj[curKey]).replace(/"/g, '').length;
+
+    return total;
+  }, 0);
+
+  return length + symbolLen;
+}
+
+export default cache;
+
+const k = Symbol('k')
+cache.set('1', 111111, 10000)
+cache.set(k, 111111, 10000)
+console.log('cache :>> ', cache.size());
