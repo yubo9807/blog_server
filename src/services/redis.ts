@@ -1,5 +1,4 @@
-import { Value, OverTime } from './cache';
-import Redis, { Cover } from './redis';
+import Redis from 'runing-redis';
 
 const redis = new Redis(1024 * 1024 * 5);
 
@@ -13,9 +12,9 @@ export default {
    * @param {boolean} cache 想知道有获取的数据有没有缓存
    * @returns 返回设置的 value
    */
-  async deposit(ctx, value?: Value, overTime: OverTime = -1, cover: Cover = false, cache = false) {
+  async deposit(ctx, value?: any, overTime = -1, cover = false, cache = false) {
     let res = null;
-    if (typeof ctx === 'string' || typeof ctx === 'symbol') {
+    if (['string', 'symbol'].includes(typeof ctx)) {
       res = await redis.deposit(ctx, value, overTime, cover)
     } else {
       res = await redis.deposit(ctx.request.url, value, overTime, cover)

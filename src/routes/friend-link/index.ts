@@ -2,11 +2,9 @@ import Router from '@koa/router';
 import { sql_getFriendLinkList, sql_addFriendLink, sql_deleteFriendLink, sql_modifyFriendLink } from '../../spider/friendLink';
 import { errorDealWith } from '../../services/errorDealWith';
 const friendLink = new Router();
-import { choke } from '@/utils/optimize'
 
 // 获取友链列表
 friendLink.get('/', async(ctx, next) => {
-  // choke(5000);  // 程序阻塞5秒
   ctx.body = await sql_getFriendLinkList();
   next();
 })
