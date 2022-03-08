@@ -1,7 +1,7 @@
 
 import { isEmptyObject } from '../utils/object';
 import { Context } from 'koa';
-import logger from 'logger';
+import logger, { LogLevel } from 'logger';
 import fs from 'fs';
 import env from '../env';
 import { dateFormater } from "../utils/date";
@@ -17,7 +17,7 @@ export async function createLogger(filename: string, ...logs: any) {
     if (e?.code === 'ENOENT') fs.mkdirSync(folder);
 
     const log = logger.createLogger(`${folder}/${filename}.log`);
-    log.format = function(level: string, date: Date, message: string) {
+    log.format = function(level: LogLevel, date: Date | string, message: string) {
       const time = dateFormater('hh:mm:ss', date);
       return time + message;
     };

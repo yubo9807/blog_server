@@ -3,8 +3,8 @@ import { Server as HttpServer } from 'http';
 import env from '../../env';
 import { verifyJwt } from '@/services/jwt';
 import { sql_queryUserData, sql_getUserList } from '@/spider/user';
-import { sql_getRoomList } from '@/spider/chat';
-import { getChatRecord } from './data';
+import { sql_addRoom, sql_deleteRoom, sql_getRoomList, sql_outRoom } from '@/spider/chat';
+import { getChatRecord, addChatRecord, deleteChatRecord } from './data';
 
 export default (server: HttpServer, path: string) => {
   const io = new Server(server, {
@@ -20,63 +20,77 @@ export default (server: HttpServer, path: string) => {
     const { name: userName } = verifyJwt(authorization);
     const isExist = (await sql_queryUserData(userName))[0];
     if (!isExist) {
-      socket.emit('errorMessage', { code: 405, msg: '登录信息错误' });
+      socket.emit('message', { code: 405, msg: '登录信息错误' });
       return;
     }
 
-    // 返回所有用户列表
+    // 返回所有用户列表，拥有的房间列表
     const users = await sql_getUserList();
-    // 看当前账号拥有的房间
-    const roomList = await sql_getRoomList(userName);
+    const rooms = await sql_getRoomList(userName);  // 看当前账号拥有的房间
     socket.emit('users', users);
-    socket.emit('rooms', roomList);
+    socket.emit(`rooms_${userName}`, rooms);
     socket.broadcast.emit('online', `${userName} 上线了`);
 
-    socket.on('roomNum', async chunk => {
+    // 查找相关聊天记录
+    socket.on(`queryRecord`, async chunk => {
       const { roomId } = chunk;
-      const rooms = getChatRecord(roomId);  // 查找相关聊天记录
-      socket.emit(`chatRecord`, rooms);
+      const records = getChatRecord(roomId);
+      socket.emit(`record_${roomId}`, records);
     })
 
+    // 添加聊天记录
     socket.on('addRecord', async chunk => {
-      const { userName, text, time, roomId } = chunk;
-      // 添加聊天记录
-      
-      const rooms = getChatRecord(roomId);  // 查找相关聊天记录
-      socket.broadcast.emit('chatRecord', rooms);
+      const { userName, text, roomId } = chunk;
+      addChatRecord({ userName, text, roomId });
+      const records = getChatRecord(roomId);  // 查找相关聊天记录
+      socket.broadcast.emit(`record_${roomId}`, records);
     })
 
-    socket.on('addRoom', async chunk => {
-      const { roomId, roomname, admin, time } = chunk;
-      // 创建房间
-
-      // 获取拥有的房间
-      
-      socket.emit('rooms', []);
+    // 创建房间
+    socket.on('createRoom', async chunk => {
+      const { roomName, admin } = chunk;
+      await sql_addRoom({ roomName, admin });  // 创建房间
+      const rooms = await sql_getRoomList(userName);  // 获取拥有的房间
+      socket.broadcast.emit(`rooms_${userName}`, rooms);
     })
 
+    // 加入房间
     socket.on('jionRoom', async chunk => {
-      const { userId, roomId, time } = chunk;
-      // 查看是否已经存在于改房间中
-      // 加入房间
-      
-      socket.emit(`roomMsg${roomId}`, '已加入该房间');
+      const { roomId } = chunk;
+      const rooms = await sql_getRoomList(userName);
+      if (rooms.length > 0) {
+        socket.emit('message', { code: 500, msg: '您已存在群聊中' });
+        return;
+      }
     })
 
+    // 退出房间
     socket.on('outRoom', async chunk => {
-      const { admin, roomId, userId, userName } = chunk;
-      // 查看是否已经存在于改房间中
-      // 退出群聊
-
+      const { roomId, admin } = chunk;
+      if (admin === userName) {
+        socket.emit('message', { code: 500, msg: '您是群聊的管理员，退出后群聊将会解散' });
+        return;
+      }
+      await sql_outRoom({ roomId, userName });  // 退出群聊
       socket.emit(`roomMsg${roomId}`, `${userName} 已退出群聊`);
+    })
+
+    // 删除房间
+    socket.on('delRoom', async chunk => {
+      const { roomId, admin } = chunk;
+      if (admin === userName) {
+        await sql_deleteRoom(roomId);  // 删除房间
+        deleteChatRecord(roomId);  // 删除相关的聊天记录
+        socket.emit('message', { code: 200, msg: '已退出群聊' });
+      }
     })
 
     // 用户掉线
     socket.on('outline', async chunk => {
+      console.log('chunk :>> ', chunk);
       const { userName } = chunk;
       socket.broadcast.emit('new outline', `${userName} 掉线`);
     })
-
 
     // 客户端断开连接
     socket.on('disconnect', () => {

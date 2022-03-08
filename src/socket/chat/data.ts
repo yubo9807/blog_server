@@ -1,3 +1,4 @@
+import { getNowDate } from '@/utils/date';
 import { createNum } from '@/utils/number';
 const iter = createNum();
 
@@ -28,7 +29,19 @@ export function getChatRecord(roomId: string | number) {
   return recordList.filter(val => val.roomId == roomId);
 }
 
-export function addChatRecord(userName: string, text: string, roomId: string) {
-  const id = iter.next().value, createTime = Date.now() / 1000;
+/**
+ * 添加聊天记录
+ * @param userName
+ * @param text 
+ * @param roomId 
+ */
+export function addChatRecord({ userName, text, roomId }) {
+  const id = iter.next().value, createTime = getNowDate();
   recordList.push({ id: (id as number), userName, text, roomId, createTime })
+}
+
+export function deleteChatRecord(roomId) {
+  recordList.forEach(val => {
+    if (val.roomId == roomId) {}
+  })
 }
