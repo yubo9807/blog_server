@@ -3,7 +3,7 @@ import { Server as HttpServer } from 'http';
 import env from '../../env';
 import { verifyJwt } from '@/services/jwt';
 import { sql_queryUserData, sql_getUserList } from '@/spider/user';
-import { sql_addRoom, sql_deleteRoom, sql_getRoomList, sql_outRoom } from '@/spider/chat';
+import { sql_createRoom, sql_deleteRoom, sql_getRoomList, sql_outRoom, sql_jionRoom } from '@/spider/chat';
 import { getChatRecord, addChatRecord, deleteChatRecord } from './data';
 
 export default (server: HttpServer, path: string) => {
@@ -40,18 +40,20 @@ export default (server: HttpServer, path: string) => {
 
     // 添加聊天记录
     socket.on('addRecord', async chunk => {
-      const { userName, text, roomId } = chunk;
+      const { text, roomId } = chunk;
       addChatRecord({ userName, text, roomId });
       const records = getChatRecord(roomId);  // 查找相关聊天记录
       socket.broadcast.emit(`record_${roomId}`, records);
+      socket.emit(`record_${roomId}`, records);
     })
 
     // 创建房间
     socket.on('createRoom', async chunk => {
-      const { roomName, admin } = chunk;
-      await sql_addRoom({ roomName, admin });  // 创建房间
+      const { roomName, roomId, names } = chunk;
+      await sql_createRoom({ roomName, admin: userName });  // 创建房间
+      await sql_jionRoom(roomId, names);
       const rooms = await sql_getRoomList(userName);  // 获取拥有的房间
-      socket.broadcast.emit(`rooms_${userName}`, rooms);
+      socket.emit(`rooms_${userName}`, rooms);
     })
 
     // 加入房间

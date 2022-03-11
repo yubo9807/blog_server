@@ -13,11 +13,11 @@ export async function sql_getUserList(name = null) {
 }
 
 // 查询用户信息（含密码）
-export async function sql_queryUserData(name: string) {
+export async function sql_queryUserData(nameOrMail: string) {
   const connect = await connection();
   const [rows] = await connect.execute(
     `SELECT * FROM users WHERE name = ? or mail = ?;`,
-    [name, name]
+    [nameOrMail, nameOrMail]
   );
   connect.end();
   return rows;

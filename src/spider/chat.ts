@@ -21,7 +21,7 @@ export async function sql_getRoomList(username: string) {
  * @param param
  * @returns 
  */
-export async function sql_addRoom({ roomName, admin }) {
+export async function sql_createRoom({ roomName, admin }) {
   const connect = await connection();
   const [ rows ] = await connect.execute(`INSERT INTO rooms (name, admin, create_time) VALUES(?, ?, ?);`, [ roomName, admin, getNowDate() ]);
   connect.end();
@@ -33,9 +33,9 @@ export async function sql_addRoom({ roomName, admin }) {
  * @param param
  * @returns
  */
-export async function jionRoom(arr: { roomId, userName }[]) {
+export async function sql_jionRoom(roomId: string | number, names: string[]) {
   let sql = '';
-  arr.forEach(val => sql += `(${val.roomId}, ${val.userName}, ${getNowDate()}),`);
+  names.forEach(val => sql += `(${roomId}, '${val}', ${getNowDate()}),`);
   const connect = await connection();
   const [ rows ] = await connect.execute(`INSERT INTO connect_user_room (room_id, user_name, create_time) VALUES ${sql.slice(0, -1)};`);
   connect.end();

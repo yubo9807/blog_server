@@ -16,7 +16,8 @@ interface SystemInfo {
   roomName: string
 }
 const recordList: ChatRecord[] = [
-  { id: '2', userName: 'test', text: 'hhhhhhhh', createTime: 321313, roomId: '1'  }
+  { id: '2', userName: 'test', text: 'hhhhhhhh', createTime: 1646873026, roomId: '1'  },
+  { id: '3', userName: '不知道是谁', text: '零零落落零零落落了', createTime: 1646873036, roomId: '1'  },
 ];
 const systemInfoList: SystemInfo[] = [];
 
