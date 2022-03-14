@@ -8,7 +8,8 @@ import connection from './connection';
  */
 export async function sql_getRoomList(username: string) {
   const connect = await connection();
-  const [ roomIdList ] = await connect.execute(`SELECT room_id FROM connect_user_room WHERE user_name = '${username}';`);
+  const [ roomList ] = await connect.execute(`SELECT room_id FROM connect_user_room WHERE user_name = '${username}';`);
+  const roomIdList = [].concat(roomList).map(val => val.room_id);
   const roomIdStr = roomIdList.toString();
   const sql = roomIdStr ? 'OR id IN (' + roomIdStr + ')' : '';
   const [ rooms ] = await connect.execute(`SELECT * FROM rooms WHERE admin = '${username}' ${sql};`);
@@ -27,6 +28,18 @@ export async function sql_createRoom({ roomName, admin }) {
   connect.end();
   return rows;
 }
+/**
+ * 查找房间Id
+ * @param param
+ * @returns 
+ */
+export async function sql_queryRoomId({ roomName, admin }) {
+  const connect = await connection();
+  const [ rows ] = await connect.execute(`SELECT id FROM rooms WHERE name = ? AND admin = ?;`, [ roomName, admin ]);
+  connect.end();
+  return rows[0].id;
+}
+
 
 /**
  * 加入房间
@@ -62,7 +75,8 @@ export async function sql_outRoom({ userName, roomId }) {
  */
 export async function sql_deleteRoom(roomId) {
   const connect = await connection();
-  const [ rows ] = await connect.execute(`DELETE FROM rooms WHERE id = ?; DELETE FROM connect_user_room WHERE room_id = ?;`, [ roomId, roomId ]);
+  await connect.execute(`DELETE FROM rooms WHERE id = ?;`, [ roomId ]);
+  await connect.execute(`DELETE FROM connect_user_room WHERE room_id = ?;`, [ roomId ]);
   connect.end();
-  return rows;
+  return;
 }

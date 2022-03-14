@@ -3,7 +3,7 @@ import { Server as HttpServer } from 'http';
 import env from '../../env';
 import { verifyJwt } from '@/services/jwt';
 import { sql_queryUserData, sql_getUserList } from '@/spider/user';
-import { sql_createRoom, sql_deleteRoom, sql_getRoomList, sql_outRoom, sql_jionRoom } from '@/spider/chat';
+import { sql_createRoom, sql_deleteRoom, sql_getRoomList, sql_queryRoomId, sql_outRoom, sql_jionRoom } from '@/spider/chat';
 import { getChatRecord, addChatRecord, deleteChatRecord } from './data';
 
 export default (server: HttpServer, path: string) => {
@@ -49,8 +49,9 @@ export default (server: HttpServer, path: string) => {
 
     // 创建房间
     socket.on('createRoom', async chunk => {
-      const { roomName, roomId, names } = chunk;
+      const { roomName, names } = chunk;
       await sql_createRoom({ roomName, admin: userName });  // 创建房间
+      const roomId = await sql_queryRoomId({ roomName, admin: userName });
       await sql_jionRoom(roomId, names);
       const rooms = await sql_getRoomList(userName);  // 获取拥有的房间
       socket.emit(`rooms_${userName}`, rooms);
@@ -83,13 +84,13 @@ export default (server: HttpServer, path: string) => {
       if (admin === userName) {
         await sql_deleteRoom(roomId);  // 删除房间
         deleteChatRecord(roomId);  // 删除相关的聊天记录
-        socket.emit('message', { code: 200, msg: '已退出群聊' });
+        const rooms = await sql_getRoomList(userName);  // 获取拥有的房间
+        socket.emit(`room_${userName}`, rooms);
       }
     })
 
     // 用户掉线
     socket.on('outline', async chunk => {
-      console.log('chunk :>> ', chunk);
       const { userName } = chunk;
       socket.broadcast.emit('new outline', `${userName} 掉线`);
     })

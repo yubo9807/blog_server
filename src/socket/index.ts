@@ -2,7 +2,9 @@ import chat from './chat';
 import env from '../env';
 
 export default async(server) => {
-
-  chat(server, env.BASE_SOCKET + '/chat');
-
+  try {
+    chat(server, env.BASE_SOCKET + '/chat');
+  } catch (error) {
+    console.log('error :>> ', error);
+  }
 }
