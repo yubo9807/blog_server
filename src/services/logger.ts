@@ -24,7 +24,6 @@ export async function createLogger(filename: string, ...logs: any) {
     log.info(logs.join(' '));
     
   });  // 文件是否存在
-  
 }
 
 /**
@@ -37,7 +36,7 @@ export function printErrorLogs(ctx: Context, error: Error) {
   const payload = isEmptyObject(query) ? JSON.stringify(request.body) : JSON.stringify(query);
   const day = dateFormater('YYYY-MM-DD');
   if (state.code >= 500) {
-    createLogger(day, url, method, payload, '\nError:', error.message);
+    createLogger(day, url, method, payload, '\nBody:', error.message);
   } else {
     createLogger(day, url, method, payload, '\n' + error.stack);
   }
