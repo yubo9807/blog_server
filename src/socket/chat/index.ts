@@ -75,7 +75,7 @@ export default (server: HttpServer, path: string) => {
         return;
       }
       await sql_outRoom({ roomId, userName });  // 退出群聊
-      socket.emit(`roomMsg${roomId}`, `${userName} 已退出群聊`);
+      socket.broadcast.emit(`roomMsg${roomId}`, `${userName} 已退出群聊`);
     })
 
     // 删除房间
@@ -85,7 +85,7 @@ export default (server: HttpServer, path: string) => {
         await sql_deleteRoom(roomId);  // 删除房间
         deleteChatRecord(roomId);  // 删除相关的聊天记录
         const rooms = await sql_getRoomList(userName);  // 获取拥有的房间
-        socket.emit(`room_${userName}`, rooms);
+        socket.emit(`rooms_${userName}`, rooms);
       }
     })
 
