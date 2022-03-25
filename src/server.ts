@@ -5,12 +5,15 @@ import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
 import Router from '@koa/router';
 import chalk from 'chalk';
+import { notify } from 'node-notifier';
+
 import koaStatic from './services/koaStatic';
 import routeConfig from './routes/config';
 import bodyDispose from './services/bodyDispose';
 import socket from './socket';
 import { getIP4Address } from '@/utils/inspect';
 import proxy from './proxy';
+
 const app = new koa();
 const server = http.createServer(app.callback());
 
@@ -38,10 +41,13 @@ app.use(koaStatic(pathConversion()));
 
 const ip4 = getIP4Address();
 const prot = 20010;
-const str = chalk.blue(`服务已启动...
-本地：http://localhost:${prot}${env.BASE_API}
-IP4： ${ip4 ? 'http://' + ip4 + ':' + prot + env.BASE_API : chalk.yellow('没连网，铁子！')}`);
+const message = `本地：http://localhost:${prot}${env.BASE_API}\n`
++ 'IP4： ' + (ip4 ? `http://${ip4}:${prot}${env.BASE_API}`: '没连网，铁子！');
 
 server.listen(prot, () => {
-	console.log(str);
+	console.log(chalk.blue(message));
+	notify({
+		title: '服务已启动...',
+		message,
+	});
 });
