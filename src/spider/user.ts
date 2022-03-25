@@ -4,7 +4,7 @@ import connection from './connection';
 export async function sql_getUserList(name = null) {
   const connect = await connection();
   const [rows] = await connect.execute(
-    name ? `SELECT id, name, role, remark, create_time, is_receive FROM users WHERE name = ?;`
+    name ? `SELECT id, name, role, mail, remark, create_time, is_receive FROM users WHERE name = ?;`
     : `SELECT id, name, role, remark, create_time, is_receive FROM users;`,
     [name]
   );
