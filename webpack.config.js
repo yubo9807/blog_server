@@ -1,19 +1,21 @@
 const path = require('path');
-const Webpack = require('webpack');
+const { DefinePlugin } = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
-  entry: './src/server.ts',
+  entry: {
+    server: './src/server.ts',
+  },
   output: {
     path: path.resolve('./dist'),
-    filename: 'server.js'
+    filename: '[name].js'
   },
   target: 'node',
   externals: [nodeExternals()],
   mode: 'production',
   // devtool: 'eval-source-map',
   plugins: [
-    new Webpack.DefinePlugin({
+    new DefinePlugin({
       'process.env': {
         APP_ENV: JSON.stringify(process.env.APP_ENV),
       }
@@ -33,5 +35,5 @@ module.exports = {
         exclude: /node_modules/,
       }
     ]
-  }
+  },
 }

@@ -1,4 +1,4 @@
-import env, { pathConversion } from './env';
+import env, { DEVELOPMENT, pathConversion } from './env';
 import http from 'http';
 import koa from 'koa';
 import bodyParser from 'koa-bodyparser';
@@ -11,7 +11,7 @@ import koaStatic from './services/koaStatic';
 import routeConfig from './routes/config';
 import bodyDispose from './services/bodyDispose';
 import socket from './socket';
-import { getIP4Address } from '@/utils/inspect';
+import { getIP4Address } from './utils/inspect';
 import proxy from './proxy';
 
 const app = new koa();
@@ -46,7 +46,7 @@ const message = `本地：http://localhost:${prot}${env.BASE_API}\n`
 
 server.listen(prot, () => {
 	console.log(chalk.blue(message));
-	notify({
+	env.NODE_ENV === DEVELOPMENT && notify({
 		title: '服务已启动...',
 		message,
 	});
