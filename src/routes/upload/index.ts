@@ -39,9 +39,10 @@ file.post('/portrait',
   async(ctx, next) => {
     const { id, name } = checkUser(ctx);
     const users = await sql_queryUserData(name);
-    const oldPath = pathConversion(users[0].portrait);
-    if (fs.existsSync(oldPath)) {
-      fs.unlinkSync(oldPath);
+    
+    if (users[0].portrait) {
+      const oldPath = pathConversion(users[0].portrait);
+      fs.existsSync(oldPath) && fs.unlinkSync(oldPath);
     }
     
     const fileList = [];
