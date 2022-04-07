@@ -2,10 +2,11 @@ import Router from '@koa/router';
 import env, { pathConversion } from '@/env';
 import koaBody from 'koa-body';
 import { errorDealWith } from '@/services/errorDealWith';
-import { sql_setUserInfo } from '@/spider/user';
+import { sql_queryUserData, sql_setUserInfo } from '@/spider/user';
 import { verifyJwt } from '@/services/jwt';
 import { Context } from 'koa';
 import { randomNum } from '@/utils/number';
+import fs from 'fs';
 
 const file = new Router();
 
@@ -25,7 +26,7 @@ file.post('/portrait',
       keepExtensions: true,  // 保留文件扩展名
       onFileBegin: (formname, file) => {
         const ext = file.name.split('.').pop();
-        const filename = Date.now() + randomNum(100000);
+        const filename = '' + Date.now() + randomNum(100000);
         // 修改上传文件路径
         file.path = pathConversion(`/imgs/portrait/${filename}.${ext}`);
       },
@@ -36,7 +37,13 @@ file.post('/portrait',
   }),
 
   async(ctx, next) => {
-    const { id } = checkUser(ctx);
+    const { id, name } = checkUser(ctx);
+    const users = await sql_queryUserData(name);
+    const oldPath = pathConversion(users[0].portrait);
+    if (fs.existsSync(oldPath)) {
+      fs.unlinkSync(oldPath);
+    }
+    
     const fileList = [];
     const formData = ctx.request.files;
     for (const prop in formData) {
