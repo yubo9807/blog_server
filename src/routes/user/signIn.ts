@@ -24,7 +24,7 @@ export default async(ctx: Context, next: Function) => {
   //   domain: 'localhost'
   // });
   ctx.body = {
-    token: publishJwt({ name: username, pass: password })
+    token: publishJwt({ name: username, pass: password, id: userData.id, role: userData.role })
   };
   next();
 }
