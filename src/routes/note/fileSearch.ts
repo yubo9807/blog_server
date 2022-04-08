@@ -1,4 +1,4 @@
-import File from '../../services/file/readFile';
+import File from '../../services/readFile';
 import fs from 'fs';
 import path from 'path';
 

@@ -8,6 +8,7 @@ const routerList = [
 	{ url: '/note', route: require('./note') },
 	{ url: '/friendLink', route: require('./friend-link') },
 	{ url: '/upload', route: require('./upload') },
+	{ url: '/file', route: require('./file') },
 	{ url: '/nozzle', route: require('./nozzle') },
 ]
 

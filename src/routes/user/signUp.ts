@@ -14,7 +14,7 @@ export default async(ctx: Context, next: Function) => {
 
   const rows = await sql_queryUserData(username);
   if (rows[0]) {
-    errorDealWith(ctx, 500, '用于已存在');
+    errorDealWith(ctx, 500, '用户已存在');
   }
 
   // 验证邮箱验证码

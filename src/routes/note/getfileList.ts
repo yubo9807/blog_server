@@ -1,4 +1,4 @@
-import File from '../../services/file/readFile';
+import File from '../../services/readFile';
 
 /**
  * 读取文件列表
