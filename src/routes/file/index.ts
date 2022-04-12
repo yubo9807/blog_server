@@ -1,13 +1,14 @@
 import fs from 'fs';
 import Router from '@koa/router';
+import { marked } from 'marked';
+
 import { pathConversion } from '@/env';
 import { errorDealWith } from '@/services/errorDealWith';
 import ReadFile from '@/services/readFile';
-import MarkdownIt from 'markdown-it';
 import redis from '@/services/redis';
+import env from '@/env';
 
 const file = new Router();
-const md = new MarkdownIt();
 
 // 获取文件夹下的文件夹和文件
 file.get('/', async(ctx, next) => {
@@ -40,12 +41,13 @@ async function getFileContentOrChildDirectory(filename: string) {
     // 是文件，返回文件内容
     const content = await fs.promises.readFile(filename, 'utf-8');
     fileAttr.ext === '.md'
-      ? body = md.render(content)
+      ? body = marked.parse(content)
       : body = content;
   } else {
     // 不是文件返回子目录
     const readFile = new ReadFile(filename);
     const arr = await readFile.getChildren();
+    arr.forEach(val => val.path = val.filename.replace(env.BASE_PUBLIC, ''));
     arr.sort((a: any, b: any) => {
       const beginWith = /^\d/;
       if (beginWith.test(a.name) && beginWith.test(b.name)) return parseInt(a.name) - parseInt(b.name);
