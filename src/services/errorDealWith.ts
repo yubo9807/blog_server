@@ -16,6 +16,7 @@ export function errorDealWith(ctx: Context, code: number = 500, msg: string = 'b
 
     // 4xx 开发者所犯错误
     400: 'unknown error',  // 未知错误
+    401: 'unauthorized',  // 未授权
     403: 'token overdue',  // token 过期
     404: 'invalid url',  // 接口不存在，无效 url
     405: 'power error',  // 当前角色没有权限

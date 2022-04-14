@@ -3,20 +3,14 @@ import env, { pathConversion } from '@/env';
 import koaBody from 'koa-body';
 import { errorDealWith } from '@/services/errorDealWith';
 import { sql_queryUserData, sql_setUserInfo } from '@/spider/user';
-import { verifyJwt } from '@/services/jwt';
-import { Context } from 'koa';
 import { randomNum } from '@/utils/number';
+import { getAuthorization } from '@/services/authorization';
 import fs from 'fs';
 
-const file = new Router();
+const upload = new Router();
 
-function checkUser(ctx: Context) {
-  const { authorization } = ctx.headers;
-  return verifyJwt(authorization);
-}
-
-// 上传头像
-file.post('/portrait',
+// #region 上传头像
+upload.post('/portrait',
 
   koaBody({
     multipart: true,  // 支持文件格式
@@ -37,7 +31,7 @@ file.post('/portrait',
   }),
 
   async(ctx, next) => {
-    const { id, name } = checkUser(ctx);
+    const { id, name } = getAuthorization(ctx);
     const users = await sql_queryUserData(name);
     
     if (users[0].portrait) {
@@ -59,5 +53,6 @@ file.post('/portrait',
   }
 
 )
+// #endregion
 
-export = file;
+export = upload;

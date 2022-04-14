@@ -8,7 +8,7 @@ import chalk from 'chalk';
 import { notify } from 'node-notifier';
 
 import koaStatic from './services/koaStatic';
-import routeConfig from './routes/config';
+import routeConfig from './routes';
 import bodyDispose from './services/bodyDispose';
 import socket from './socket';
 import { getIP4Address } from './utils/inspect';
