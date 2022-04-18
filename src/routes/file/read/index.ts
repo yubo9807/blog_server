@@ -35,27 +35,40 @@ export = read;
  * @returns 
  */
 async function getFileContentOrChildDirectory(filename: string) {
-  let body: string | any[] | Buffer = '';
+  let body: any;
   
-  const fileAttr = await ReadFile.getFile(filename);
+  const fileAttr: any = await ReadFile.getFile(filename);
   
   if (fileAttr.isFile) {
+    fileAttr.path = fileAttr.filename.replace(env.BASE_PUBLIC, '');
+    fileAttr.updataTime = parseInt('' + new Date(fileAttr.updataTime).getTime() / 1000);
+    fileAttr.createTime = parseInt('' + new Date(fileAttr.createTime).getTime() / 1000);
+
     // 是文件，返回文件内容
-    const content = await fs.promises.readFile(filename, 'utf-8');
-    fileAttr.ext === '.md'
-      ? body = marked.parse(content)
-      : body = content;
+    let content = await fs.promises.readFile(filename, 'utf-8');
+    fileAttr.ext === '.md' && (content = marked.parse(content));
+    body = { ...fileAttr, content };
+
   } else {
+
     // 不是文件返回子目录
     const readFile = new ReadFile(filename);
     const arr = await readFile.getChildren();
-    arr.forEach(val => val.path = val.filename.replace(env.BASE_PUBLIC, ''));
+    arr.forEach(val => {
+      val.path = val.filename.replace(env.BASE_PUBLIC, '');
+      val.updataTime = parseInt('' + new Date(val.updataTime).getTime() / 1000);
+      val.createTime = parseInt('' + new Date(val.createTime).getTime() / 1000);
+    });
+
+    // 排序
     arr.sort((a: any, b: any) => {
       const beginWith = /^\d/;
       if (beginWith.test(a.name) && beginWith.test(b.name)) return parseInt(a.name) - parseInt(b.name);
       else return new Intl.Collator('en').compare(a.name, b.name);
     });
+
     body = arr;
+
   }
   
   return body;

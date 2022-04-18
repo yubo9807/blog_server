@@ -1,5 +1,4 @@
 
-import { isEmptyObject } from '../utils/object';
 import { Context } from 'koa';
 import logger, { LogLevel } from 'logger';
 import fs from 'fs';
@@ -32,12 +31,21 @@ export async function createLogger(filename: string, ...logs: any) {
  * @param error 
  */
 export function printErrorLogs(ctx: Context, error: Error) {
-  const { url, query, request, state, method } = ctx;
-  const payload = isEmptyObject(query) ? JSON.stringify(request.body) : JSON.stringify(query);
+  const { url, query, request, state, method, headers } = ctx;
   const day = dateFormater('YYYY-MM-DD');
+
+  const arr = [
+    url, method,
+    '\nParams:', JSON.stringify(query),
+    '\nData:', JSON.stringify(request.body),
+    '\nHeaders:', JSON.stringify(headers),
+  ];
+
   if (state.code >= 500) {
-    createLogger(day, url, method, payload, '\nBody:', error.message);
+    arr.push('\nBody:' + error.message);
   } else {
-    createLogger(day, url, method, payload, '\n' + error.stack);
+    arr.push('\n' + error.stack);
   }
+
+  createLogger(day, ...arr);
 }
