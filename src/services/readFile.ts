@@ -40,11 +40,13 @@ export default class File {
 			return [];
 		}
 		let children: any[] = await fs.promises.readdir(this.filename);
-		children = children.map((name: string) => {
+		const arr = [];
+		children.forEach((name: string) => {
+			if (['.DS_Store', '.git'].includes(name)) return;
 			const result = path.resolve(this.filename, name);
-			return File.getFile(result);
+			arr.push(File.getFile(result));
 		});
-		return Promise.all(children);
+		return Promise.all(arr);
 	}
 
 	/**
