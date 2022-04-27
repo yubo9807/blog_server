@@ -4,6 +4,7 @@ const file = new Router();
 const routerList = [
 	{ url: '/upload', route: require('./upload') },
 	{ url: '/read', route: require('./read') },
+	{ url: '/search', route: require('./search') },
 ]
 
 routerList.forEach(val => {
