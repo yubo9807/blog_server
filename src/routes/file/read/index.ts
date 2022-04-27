@@ -4,11 +4,12 @@ import { marked } from 'marked';
 
 import { pathConversion } from '@/env';
 import { errorDealWith } from '@/services/errorDealWith';
-import ReadFile from '@/services/readFile';
+import File from '@/utils/file';
 import redis from '@/services/redis';
 import env from '@/env';
 
 const read = new Router();
+
 
 // 获取文件夹下的文件夹和文件
 read.get('/', async(ctx, next) => {
@@ -37,7 +38,7 @@ export = read;
 async function getFileContentOrChildDirectory(filename: string) {
   let body: any;
   
-  const fileAttr: any = await ReadFile.getFile(filename);
+  const fileAttr: any = await File.getStat(filename);
   
   if (fileAttr.isFile) {
     fileAttr.path = fileAttr.filename.replace(env.BASE_PUBLIC, '');
@@ -45,15 +46,16 @@ async function getFileContentOrChildDirectory(filename: string) {
     fileAttr.createTime = parseInt('' + new Date(fileAttr.createTime).getTime() / 1000);
 
     // 是文件，返回文件内容
-    let content = await fs.promises.readFile(filename, 'utf-8');
+    const file = new File();
+    let content = await file.getContent(filename);
     fileAttr.ext === '.md' && (content = marked.parse(content));
     body = { ...fileAttr, content };
 
   } else {
 
     // 不是文件返回子目录
-    const readFile = new ReadFile(filename);
-    const arr = await readFile.getChildren();
+    const file = new File();
+    const arr = await file.getChildren(filename);
     arr.forEach(val => {
       val.path = val.filename.replace(env.BASE_PUBLIC, '');
       val.updataTime = parseInt('' + new Date(val.updataTime).getTime() / 1000);
