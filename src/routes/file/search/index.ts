@@ -35,6 +35,8 @@ async function searchFile(filename: string, text: string, arr = []) {
     const [ error, content ] = await asyncto(file.getContent(prop.filename));
     if (!error && content.includes(text)) {
       prop.path = prop.filename.replace(env.BASE_PUBLIC, '');
+      const startIndex = content.search(text);
+      prop.content = content.slice(startIndex, startIndex + 120);
       arr.push(prop);
     }
   }
