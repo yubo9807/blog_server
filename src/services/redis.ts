@@ -1,4 +1,5 @@
-import Redis from 'runing-redis';
+import Redis from './runing-redis';
+import cache from './runing-redis/cache';
 
 const redis = new Redis(1024 * 1024 * 5);
 
@@ -38,4 +39,20 @@ export default {
    * 删除最早缓存的数据
    */
   deleteOverValue: redis.deleteOverValue,
+
+  /**
+   * 获取数据存储大小
+   */
+  size: cache.size,
+
+  /**
+   * 获取存储的所有数据
+   */
+  gainAll: cache.gainAll,
+
+  /**
+   * 获取数据长度
+   */
+  length: cache.length,
+
 }

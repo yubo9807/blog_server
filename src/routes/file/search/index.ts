@@ -6,6 +6,7 @@ import { errorDealWith } from '@/services/errorDealWith';
 
 import File from '@/utils/file';
 import { asyncto } from '@/utils/network';
+import redis from '@/services/redis';
 
 const search = new Router();
 const file = new File();
@@ -17,7 +18,9 @@ search.get('/', async(ctx, next) => {
   const filename = pathConversion((basePath as string));
   !fs.existsSync(filename) && errorDealWith(ctx, 500, '路径不存在');
 
-  const filenameArr = await searchFile(filename, (text as string));
+  const filenameArr = await redis.deposit(ctx, async () => {
+    return await searchFile(filename, (text as string))
+  }, 1000 * 60 * 10);
 
   ctx.body = filenameArr;
   next();
