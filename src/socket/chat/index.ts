@@ -18,8 +18,8 @@ export default (server: HttpServer, path: string) => {
   io.on('connection', async(socket) => {
     const authorization = socket.request.headers.authorization || '';
     const { name: userName } = verifyJwt(authorization);
-    const isExist = (await sql_queryUserData(userName))[0];
-    if (!isExist) {
+    const userInfo = (await sql_queryUserData(userName))[0];
+    if (!userInfo) {
       socket.emit('message', { code: 405, msg: '登录信息错误' });
       return;
     }
@@ -41,7 +41,7 @@ export default (server: HttpServer, path: string) => {
     // 添加聊天记录
     socket.on('addRecord', async chunk => {
       const { text, roomId } = chunk;
-      addChatRecord({ userName, text, roomId });
+      addChatRecord({ userName, portrait: userInfo.portrait, text, roomId });
       const records = getChatRecord(roomId);  // 查找相关聊天记录
       socket.broadcast.emit(`record_${roomId}`, records);
       socket.emit(`record_${roomId}`, records);
