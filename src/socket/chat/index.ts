@@ -3,7 +3,7 @@ import { Server as HttpServer } from 'http';
 import env from '../../env';
 import { verifyJwt } from '@/services/jwt';
 import { sql_queryUserData, sql_getUserList } from '@/spider/user';
-import { sql_createRoom, sql_deleteRoom, sql_getRoomList, sql_queryRoomId, sql_outRoom, sql_jionRoom } from '@/spider/chat';
+import { sql_createRoom, sql_deleteRoom, sql_getRoomList, sql_queryRoomId, sql_outRoom, sql_jionRoom, sql_updateRoomName } from '@/spider/chat';
 import { getChatRecord, addChatRecord, deleteChatRecord } from './data';
 
 export default (server: HttpServer, path: string) => {
@@ -24,6 +24,7 @@ export default (server: HttpServer, path: string) => {
       return;
     }
 
+  
     // 返回所有用户列表，拥有的房间列表
     const users = await sql_getUserList();
     const rooms = await sql_getRoomList(userName);  // 看当前账号拥有的房间
@@ -31,12 +32,17 @@ export default (server: HttpServer, path: string) => {
     socket.emit(`rooms_${userName}`, rooms);
     socket.broadcast.emit('online', `${userName} 上线了`);
 
+
+    // #region 聊天记录
+
     // 查找相关聊天记录
     socket.on(`queryRecord`, async chunk => {
       const { roomId } = chunk;
       const records = getChatRecord(roomId);
       socket.emit(`record_${roomId}`, records);
     })
+
+
 
     // 添加聊天记录
     socket.on('addRecord', async chunk => {
@@ -46,6 +52,12 @@ export default (server: HttpServer, path: string) => {
       socket.broadcast.emit(`record_${roomId}`, records);
       socket.emit(`record_${roomId}`, records);
     })
+
+    // #endregion
+
+
+
+    // #region 房间
 
     // 创建房间
     socket.on('createRoom', async chunk => {
@@ -81,13 +93,35 @@ export default (server: HttpServer, path: string) => {
     // 删除房间
     socket.on('delRoom', async chunk => {
       const { roomId, admin } = chunk;
-      if (admin === userName) {
-        await sql_deleteRoom(roomId);  // 删除房间
-        deleteChatRecord(roomId);  // 删除相关的聊天记录
-        const rooms = await sql_getRoomList(userName);  // 获取拥有的房间
-        socket.emit(`rooms_${userName}`, rooms);
+      if (admin !== userName) {
+        socket.emit('message', { code: 500, msg: '您不是群聊的管理员' });
+        return;
       }
+      await sql_deleteRoom(roomId);  // 删除房间
+      deleteChatRecord(roomId);  // 删除相关的聊天记录
+      const rooms = await sql_getRoomList(userName);  // 获取拥有的房间
+      socket.emit(`rooms_${userName}`, rooms);
     })
+
+    // 修改房间名称
+    socket.on('fixRoomName', async chunk => {
+      const { roomId, admin, name } = chunk;
+      if (!name) {
+        socket.emit('message', { code: 500, msg: '房间名称不能为空' });
+        return;
+      }
+      if (admin !== userName) {
+        socket.emit('message', { code: 500, msg: '您不是群聊的管理员' });
+        return;
+      }
+      await sql_updateRoomName(roomId, name);  // 修改房间名称
+      const rooms = await sql_getRoomList(userName);  // 获取拥有的房间
+      socket.emit(`rooms_${userName}`, rooms);
+    })
+
+    // #endregion
+
+
 
     // 用户掉线
     socket.on('outline', async chunk => {

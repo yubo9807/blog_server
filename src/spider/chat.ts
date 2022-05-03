@@ -80,3 +80,13 @@ export async function sql_deleteRoom(roomId) {
   connect.end();
   return;
 }
+
+/**
+ * 修改房间名称
+ */
+export async function sql_updateRoomName(roomId: number | string, roomName: string) {
+  const connect = await connection();
+  await connect.execute(`UPDATE rooms SET name = ? WHERE id = ?;`, [ roomName, roomId ]);
+  connect.end();
+  return;
+}
