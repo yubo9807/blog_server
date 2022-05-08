@@ -21,7 +21,9 @@ export default class Redis {
   constructor(maxCache = 1024 * 1024 * 2) {
     this.maxCache = maxCache;  // 最大缓存数
   }
-  
+
+
+
   /**
    * 储存数据，如果已经存在并且没有过期你会直接获取到该数据
    * @param {string} key 设置存放数据的键
@@ -54,7 +56,12 @@ export default class Redis {
     }
   }
 
-  // 清除数据（过期的，早以前的）
+
+
+  /**
+   * 清除数据（过期的，早以前的）
+   * @returns 
+   */
   clearCache() {
     this.deleteOverValue();  // 清除已过期数据
     const size = cache.size();
@@ -71,7 +78,11 @@ export default class Redis {
     this.deleteFristValue(newArr);
   }
   
-  // 删除过期的数据
+
+
+  /**
+   * 删除过期的数据
+   */
   deleteOverValue() {
     const obj: ItemObj[]  = cache.gainAll();
     const curTime = Date.now();
@@ -84,7 +95,13 @@ export default class Redis {
     }
   }
 
-  // 删除最早缓存的数据
+
+
+  /**
+   * 删除最早缓存的数据
+   * @param arr 
+   * @returns 
+   */
   deleteFristValue(arr: SortArr[]) {
     const key = arr[0].key;
     arr.shift();
@@ -98,7 +115,7 @@ export default class Redis {
 }
 
 /**
- * 数据排序算法
+ * 数据排序算法（二分查找）
  * @param arr 
  * @returns 
  */

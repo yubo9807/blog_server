@@ -40,8 +40,8 @@ export default {
     const value = map.get(key);
     if (value == null) return;
 
-    const time = Date.now();
-    (time - value.createTime > value.overTime) && this.delete(key);
+    const nowTime = Date.now();
+    (nowTime - value.createTime > value.overTime) && this.delete(key);
     const newValue = map.get(key);
     return newValue && newValue.value;
   },
