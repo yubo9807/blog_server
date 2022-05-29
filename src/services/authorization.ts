@@ -1,3 +1,4 @@
+import { asyncto } from "@/utils/network";
 import { Context } from "koa";
 import { errorDealWith } from "./errorDealWith";
 import { verifyJwt } from "./jwt";
@@ -7,10 +8,14 @@ import { verifyJwt } from "./jwt";
  * @param ctx
  * @returns
  */
-export function getAuthorization(ctx: Context) {
+export async function getAuthorization(ctx: Context) {
   const { authorization } = ctx.headers;
   if (!authorization) errorDealWith(ctx, 401);  // 获取不到
-  return verifyJwt(authorization);
+  const [ error, data ] = await asyncto(verifyJwt(authorization));
+  if (error) {
+    error === 'jwt expired' ? errorDealWith(ctx, 403) : errorDealWith(ctx, 500, error);
+  }
+  return data;
 }
 
 /**
@@ -18,8 +23,8 @@ export function getAuthorization(ctx: Context) {
  * @param ctx
  * @param role 角色
  */
-export function powerDetection(ctx: Context, role: string = '') {
-  const user = getAuthorization(ctx);
-  if (role && user.role !== role) errorDealWith(ctx, 405);
+export async function powerDetection(ctx: Context, role: string = '') {
+  const user = await getAuthorization(ctx);
+  if (role && user && user.role !== role) errorDealWith(ctx, 405);
   return user;
 }

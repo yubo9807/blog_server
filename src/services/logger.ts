@@ -11,7 +11,7 @@ import { dateFormater } from "../utils/date";
  * @param logs
  */
 export async function createLogger(filename: string, ...logs: any) {
-  const folder = `${env.BASE_URL}/logs`;
+  const folder = `${env.BASE_PUBLIC}/logs`;
   fs.stat(folder, e => {
     if (e?.code === 'ENOENT') fs.mkdirSync(folder);
 
@@ -30,19 +30,19 @@ export async function createLogger(filename: string, ...logs: any) {
  * @param ctx 
  * @param error 
  */
-export function printErrorLogs(ctx: Context, error: Error) {
+export function printErrorLogs(ctx: Context, error: string | Error) {
   const { url, query, request, state, method, headers } = ctx;
   const day = dateFormater('YYYY-MM-DD');
 
   const arr = [
-    url, method,
-    '\nParams:', JSON.stringify(query),
+    url, method, ctx.request.ip, env.NODE_ENV,
+    // '\nParams:', JSON.stringify(query),
     '\nData:', JSON.stringify(request.body),
     '\nHeaders:', JSON.stringify(headers),
   ];
 
-  if (state.code >= 500) {
-    arr.push('\nBody:' + error.message);
+  if (typeof error === 'string') {
+    arr.push('\nBody:' + error);
   } else {
     arr.push('\n' + error.stack);
   }

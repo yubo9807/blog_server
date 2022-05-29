@@ -16,7 +16,7 @@ export default async(ctx: Context, next: Function) => {
     errorDealWith(ctx, 500, '用户不存在');
   }
 
-  if (username !== userData.name || password !== verifyJwt(userData.pass)) {
+  if (username !== userData.name || password !== await verifyJwt(userData.pass)) {
     errorDealWith(ctx, 500, '用户名或密码错误');
   }
 

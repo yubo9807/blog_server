@@ -10,8 +10,8 @@ export function getIP4Address() {
   const { en0 } = networkInterfaces();
   if (!en0) return;
 
-  const enAddress = en0.find(val => val.family === 'IPv4').address;
-  return enAddress;
+  const IPv4 = en0.find(val => val.family === 'IPv4');
+  return IPv4 && IPv4.address;
 }
 
 

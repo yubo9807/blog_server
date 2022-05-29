@@ -2,14 +2,12 @@ import { Context } from "koa";
 import { errorDealWith } from "../../services/errorDealWith";
 import { verifyJwt } from "../../services/jwt";
 import { sql_getUserList } from "../../spider/user";
+import { getAuthorization } from '@/services/authorization';
 
 export default async(ctx: Context, next: Function) => {
-  const { token } = ctx.query;
-  if (!token) {
-    errorDealWith(ctx, 406);
-  }
+  const user = await getAuthorization(ctx);
 
-  const { name } = verifyJwt(token);
+  const { name } = user;
 
   if (!name) {
     errorDealWith(ctx, 500, '没有该用户信息');

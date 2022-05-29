@@ -1,12 +1,14 @@
 import { Context } from 'koa';
+import { printErrorLogs } from './logger';
 
 /**
  * 将 code 码统一，方便前端拦截器处理
  * @param ctx
- * @param code 
- * @param msg 
+ * @param code code 码
+ * @param msg 错误消息，500 的时候传
+ * @param print 是否打印日志
  */
-export function errorDealWith(ctx: Context, code: number = 500, msg: string = 'business logic error') {
+export function errorDealWith(ctx: Context, code: number = 500, msg: string = 'business logic error', print = true) {
 
   if (code === 500 && ['', undefined, null].includes(msg)) {
     throw new Error('param \'msg\' cannot be empty');  // 防止开发者传参导致后面数据返回 code:404
@@ -29,9 +31,15 @@ export function errorDealWith(ctx: Context, code: number = 500, msg: string = 'b
 
   }
 
-  ctx.state.msg = errorMsg[code];
-  ctx.state.code = code;
+  const { state } = ctx;
+  state.msg = errorMsg[code];
+  state.code = code;
 
-  ctx.throw(200, JSON.stringify(ctx.state));
+  if (print) {
+    const error = code === 400 ? new Error(state.msg) : JSON.stringify(state);
+    printErrorLogs(ctx, error);
+  }
+
+  ctx.throw(200, JSON.stringify(state));
 
 }

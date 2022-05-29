@@ -31,7 +31,7 @@ upload.post('/portrait',
   }),
 
   async(ctx, next) => {
-    const { id, name } = getAuthorization(ctx);
+    const { id, name } = await getAuthorization(ctx);
     const users = await sql_queryUserData(name);
     
     if (users[0].portrait) {

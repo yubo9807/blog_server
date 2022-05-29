@@ -5,6 +5,7 @@ import { verifyJwt } from '@/services/jwt';
 import { sql_queryUserData, sql_getUserList } from '@/spider/user';
 import { sql_createRoom, sql_deleteRoom, sql_getRoomList, sql_queryRoomId, sql_outRoom, sql_jionRoom, sql_updateRoomName } from '@/spider/chat';
 import { getChatRecord, addChatRecord, deleteChatRecord } from './data';
+import { asyncto } from '@/utils/network';
 
 export default (server: HttpServer, path: string) => {
   const io = new Server(server, {
@@ -17,7 +18,8 @@ export default (server: HttpServer, path: string) => {
   // 建立连接
   io.on('connection', async(socket) => {
     const authorization = socket.request.headers.authorization || '';
-    const { name: userName } = verifyJwt(authorization);
+    const [ error, user ] = await asyncto(verifyJwt(authorization));
+    const { name: userName } = user || {};
     const userInfo = (await sql_queryUserData(userName))[0];
     if (!userInfo) {
       socket.emit('message', { code: 405, msg: '登录信息错误' });

@@ -10,8 +10,8 @@ let requestRate = 1;  // 请求频率
  * @param maxRequestNumber 允许最大请求数
  */
 export default async function (ctx: Context, time = 5000, maxRequestNumber = 20) {
-
-	const requestStr = await redis.deposit('requestNumber', '请求次数', time, false, true);
+	const IP = ctx.request.ip;
+	const requestStr = await redis.deposit(`requestNumber_${IP}`, '请求次数', time, false, true);
 
 	if (requestStr.cache) requestRate ++;
 	else {

@@ -21,7 +21,7 @@ export async function sql_getUserList(name = null) {
  * @param nameOrMail 用户名或邮箱
  * @returns 
  */
-export async function sql_queryUserData(nameOrMail: string) {
+export async function sql_queryUserData(nameOrMail: string | null = null) {
   const connect = await connection();
   const [rows] = await connect.execute(
     `SELECT * FROM users WHERE name = ? or mail = ?;`,
