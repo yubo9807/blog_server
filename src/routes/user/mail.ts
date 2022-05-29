@@ -1,5 +1,5 @@
 import { Context } from "koa";
-import { errorDealWith } from "../../services/errorDealWith";
+import { throwError } from "../../services/errorDealWith";
 import redis from "../../services/redis";
 import { mailDelivery } from '../../services/sendMail';
 import { randomNum } from '../../utils/number';
@@ -8,7 +8,7 @@ export async function getMailCode(ctx: Context, next: Function) {
   const { mail } = ctx.query;
   
   if (!mail) {
-    errorDealWith(ctx, 406);
+    throwError(ctx, 406);
   }
 
   await redis.deposit(mail, async() => {

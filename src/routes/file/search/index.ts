@@ -2,7 +2,7 @@ import fs from 'fs';
 import Router from '@koa/router';
 
 import env, { pathConversion } from '@/env';
-import { errorDealWith } from '@/services/errorDealWith';
+import { throwError } from '@/services/errorDealWith';
 
 import File from '@/utils/file';
 import { asyncto } from '@/utils/network';
@@ -16,7 +16,7 @@ const file = new File();
 search.get('/', async(ctx, next) => {
   const { basePath, text } = ctx.query;
   const filename = pathConversion((basePath as string));
-  !fs.existsSync(filename) && errorDealWith(ctx, 500, '路径不存在');
+  !fs.existsSync(filename) && throwError(ctx, 500, '路径不存在');
 
   const filenameArr = await redis.deposit(ctx, async () => {
     return await searchFile(filename, (text as string))

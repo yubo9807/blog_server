@@ -1,7 +1,7 @@
 import Router from '@koa/router';
 import env, { pathConversion } from '@/env';
 import koaBody from 'koa-body';
-import { errorDealWith } from '@/services/errorDealWith';
+import { throwError } from '@/services/errorDealWith';
 import { sql_queryUserData, sql_setUserInfo } from '@/spider/user';
 import { randomNum } from '@/utils/number';
 import { getAuthorization } from '@/services/authorization';
@@ -26,7 +26,7 @@ upload.post('/portrait',
       },
     },
     onError: (error, ctx) => {
-      errorDealWith(ctx, 500, error.message);
+      throwError(ctx, 500, error.message);
     }
   }),
 

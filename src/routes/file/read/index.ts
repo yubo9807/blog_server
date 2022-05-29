@@ -3,7 +3,7 @@ import Router from '@koa/router';
 import { marked } from 'marked';
 
 import { pathConversion } from '@/env';
-import { errorDealWith } from '@/services/errorDealWith';
+import { throwError } from '@/services/errorDealWith';
 import File from '@/utils/file';
 import redis from '@/services/redis';
 import env from '@/env';
@@ -16,7 +16,7 @@ read.get('/', async(ctx, next) => {
   const { path } = ctx.query;
   const filename = pathConversion((path as string));
 
-  !fs.existsSync(filename) && errorDealWith(ctx, 500, '路径不存在');
+  !fs.existsSync(filename) && throwError(ctx, 500, '路径不存在');
 
   const body = await redis.deposit(ctx, async() => {
     return await getFileContentOrChildDirectory(filename);

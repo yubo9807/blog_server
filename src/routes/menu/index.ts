@@ -1,6 +1,6 @@
 import Router from '@koa/router';
 import { sql_appMenuList, sql_deleteMenuList, sql_getMenuList, sql_modifyMenuConfig, sql_modifyMenuList, sql_replaceMenuOrder } from '@/spider/menu';
-import { errorDealWith } from '@/services/errorDealWith';
+import { throwError } from '@/services/errorDealWith';
 const menu = new Router();
 
 // 获取所有菜单
@@ -27,7 +27,7 @@ menu.put('/order', async(ctx, next) => {
   if (replaceArr instanceof Array && replaceArr.length === 2) {
     await sql_replaceMenuOrder(replaceArr[0], replaceArr[1]);
   } else {
-    errorDealWith(ctx, 406);
+    throwError(ctx, 406);
   }
   
   ctx.body = 'success';
@@ -44,7 +44,7 @@ menu.put('/config', async(ctx, next) => {
     next();
   }
 
-  errorDealWith(ctx, 406);
+  throwError(ctx, 406);
 
 })
 

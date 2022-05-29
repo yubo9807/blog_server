@@ -8,7 +8,7 @@ import { printErrorLogs } from './logger';
  * @param msg 错误消息，500 的时候传
  * @param print 是否打印日志
  */
-export function errorDealWith(ctx: Context, code: number = 500, msg: string = 'business logic error', print = true) {
+export function throwError(ctx: Context, code: number = 500, msg: string = 'business logic error', print = true) {
 
   if (code === 500 && ['', undefined, null].includes(msg)) {
     throw new Error('param \'msg\' cannot be empty');  // 防止开发者传参导致后面数据返回 code:404

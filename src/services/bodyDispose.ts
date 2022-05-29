@@ -1,8 +1,8 @@
-import env from '../env';
 import { Context } from 'koa';
-import { errorDealWith } from './errorDealWith';
+import env from '../env';
+import { throwError } from './errorDealWith';
+import { printErrorLogs } from './logger';
 import preventDataRefresh from './preventDataRefresh';
-import { sql_addBlockList, sql_queryBlockList } from '@/spider/blacklist';
 
 export default async(ctx: Context, next: () => {}) => {
 
@@ -17,26 +17,16 @@ export default async(ctx: Context, next: () => {}) => {
 	ctx.state.redis_cache = false;
 
 	// 数据防刷
-	const queryBlackList = await sql_queryBlockList(ctx.request.ip);
-	if (queryBlackList[0]) {
-		errorDealWith(ctx, 500, '您已被限制访问，请联系管理员', false);
-	}
-	const beyondRefresh = await preventDataRefresh(ctx);
-	if (beyondRefresh) {
-		const { request_rate } = ctx.state;
-		if (request_rate > 100) {  // 请求频率超过100，加入黑名单
-			await sql_addBlockList(ctx.request.ip, request_rate);
-		}
-		errorDealWith(ctx, 513, null, false);
-	}
-
-	// 打印日志
+	await preventDataRefresh(ctx);
+	
+	// 捕获错误，打印日志
 	try {
 		await next();
 	} catch (error) {
 		// code 依然为 400，说明错误并没有被捕获到
 		if (ctx.state.code === 400 && error) {
-			errorDealWith(ctx, 400);
+			throwError(ctx, 400, null, false);
+			printErrorLogs(ctx, error);
 		}
 	}
 
@@ -45,7 +35,7 @@ export default async(ctx: Context, next: () => {}) => {
 	const endTime = Date.now();
 
 	if (state.msg == '' && !body) {  // 没错误消息，也没body
-		errorDealWith(ctx, 404, null, false);
+		throwError(ctx, 404, null, false);
 	} else if (body) {  // 正常返回数据
 		ctx.body = {
 			code: 200,
