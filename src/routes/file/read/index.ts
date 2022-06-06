@@ -42,8 +42,6 @@ async function getFileContentOrChildDirectory(filename: string) {
   
   if (fileAttr.isFile) {
     fileAttr.path = fileAttr.filename.replace(env.BASE_PUBLIC, '');
-    fileAttr.updataTime = parseInt('' + new Date(fileAttr.updataTime).getTime() / 1000);
-    fileAttr.createTime = parseInt('' + new Date(fileAttr.createTime).getTime() / 1000);
 
     // 是文件，返回文件内容
     const file = new File();
@@ -58,8 +56,6 @@ async function getFileContentOrChildDirectory(filename: string) {
     const arr = await file.getChildren(filename);
     arr.forEach(val => {
       val.path = val.filename.replace(env.BASE_PUBLIC, '');
-      val.updataTime = parseInt('' + new Date(val.updataTime).getTime() / 1000);
-      val.createTime = parseInt('' + new Date(val.createTime).getTime() / 1000);
     });
 
     // 排序

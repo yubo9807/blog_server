@@ -5,8 +5,7 @@ const routerList = [
 	{ url: '/user', route: require('./user') },
 	{ url: '/role', route: require('./role') },
 	{ url: '/menu', route: require('./menu') },
-	{ url: '/note', route: require('./note') },
-	{ url: '/friendLink', route: require('./friend-link') },
+	{ url: '/friendLink', route: require('./friendLink') },
 	{ url: '/file', route: require('./file') },
 	{ url: '/nozzle', route: require('./nozzle') },
 ]

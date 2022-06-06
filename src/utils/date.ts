@@ -1,5 +1,5 @@
-export function getNowDate() {
-  return parseInt(String(Date.now() / 1000));
+export function getNowDate(timestamp: Date | number = Date.now()) {
+  return parseInt(String(new Date(timestamp).getTime() / 1000));
 }
 
 /**

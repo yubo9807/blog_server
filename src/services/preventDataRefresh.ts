@@ -45,6 +45,11 @@ export default async function(ctx: Context) {
 		const { request_rate } = ctx.state;
 		if (request_rate > 100) {  // 请求频率超过100，加入黑名单
 			await sql_addBlockList(ctx.request.ip, request_rate);
+			
+			// 覆盖掉缓存中的数据
+			await redis.deposit(key, async () => {
+				return await sql_queryBlockList(ctx.request.ip);
+			}, -1, true);
 		}
 		throwError(ctx, 513, null, false);
 	}

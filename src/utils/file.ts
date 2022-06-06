@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { asyncto } from './network';
+import { getNowDate } from './date';
 
 export default class File {
 
@@ -22,8 +23,8 @@ export default class File {
       filename,
       isFile: stat.isFile(),  // 是否为文件
       size: stat.size,
-		  createTime: stat.birthtime,
-		  updataTime: stat.mtime,
+		  createTime: getNowDate(stat.birthtime),
+		  updataTime: getNowDate(stat.mtime),
       name: path.basename(filename),  // 文件名
 		  ext: path.extname(filename),  // 文件后缀
     })
