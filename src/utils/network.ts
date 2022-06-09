@@ -1,3 +1,4 @@
+import { Context } from 'koa';
 /**
  * 请求函数封装
  * @param promise
@@ -14,4 +15,10 @@ export function asyncto(promise: Promise<any>, errorExt: string = '') {
       }
       return [ err, undefined ];
     })
+}
+
+export function getClientIP(ctx: Context) {
+  const { request } = ctx;
+  const ip = request.headers['x-real-ip'];
+  return ip && ip.toString() || request.ip.replace('::ffff:', '');
 }

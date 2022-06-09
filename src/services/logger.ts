@@ -4,6 +4,7 @@ import logger, { LogLevel } from 'logger';
 import fs from 'fs';
 import env from '../env';
 import { dateFormater } from "../utils/date";
+import { getClientIP } from '@/utils/network';
 
 /**
  * 生成一条日志
@@ -35,7 +36,7 @@ export function printErrorLogs(ctx: Context, error: string | Error) {
   const day = dateFormater('YYYY-MM-DD');
 
   const arr = [
-    url, method, ctx.request.ip, env.NODE_ENV,
+    url, method, getClientIP(ctx), env.NODE_ENV,
     // '\nParams:', JSON.stringify(query),
     '\nData:', JSON.stringify(request.body),
     '\nHeaders:', JSON.stringify(headers),

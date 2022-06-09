@@ -2,6 +2,7 @@ import { Context } from "koa";
 import redis from './redis';
 import { sql_addBlockList, sql_queryBlockList } from '@/spider/blacklist';
 import { throwError } from "./errorDealWith";
+import { getClientIP } from '@/utils/network';
 
 let requestRate = 1;  // 请求频率
 
@@ -34,8 +35,9 @@ async function requestCount(ctx: Context, time = 5000, maxRequestNumber = 20) {
 
 export default async function(ctx: Context) {
 	const key = Symbol('request_number');
+	const IP = getClientIP(ctx);
 	const queryBlackList = redis.deposit(key, async () => {
-		return await sql_queryBlockList(ctx.request.ip);
+		return await sql_queryBlockList(IP);
 	});
 	if (queryBlackList[0]) {
 		throwError(ctx, 500, '您已被限制访问，请联系管理员', false);
@@ -44,11 +46,11 @@ export default async function(ctx: Context) {
 	if (beyondRefresh) {
 		const { request_rate } = ctx.state;
 		if (request_rate > 100) {  // 请求频率超过100，加入黑名单
-			await sql_addBlockList(ctx.request.ip, request_rate);
+			await sql_addBlockList(IP, request_rate);
 			
 			// 覆盖掉缓存中的数据
 			await redis.deposit(key, async () => {
-				return await sql_queryBlockList(ctx.request.ip);
+				return await sql_queryBlockList(IP);
 			}, -1, true);
 		}
 		throwError(ctx, 513, null, false);
