@@ -7,6 +7,7 @@ const routerList = [
 	{ url: '/menu', route: require('./menu') },
 	{ url: '/friendLink', route: require('./friendLink') },
 	{ url: '/file', route: require('./file') },
+	{ url: '/blacklist', route: require('./blacklist') },
 	{ url: '/nozzle', route: require('./nozzle') },
 ]
 

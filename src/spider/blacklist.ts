@@ -29,12 +29,12 @@ export async function sql_queryBlockList(ip: string | null = null) {
 
 /**
  * 删除黑名单列表ip
- * @param ip 查询ip
+ * @param id 查询ip
  * @returns 
  */
-export async function sql_deleteBlockList(ip: string) {
+export async function sql_deleteBlockList(id: string) {
   const connect = await connection();
-  const [ rows ] = await connect.execute(`DELETE FROM blacklist WHERE ip = '${ip}';`);
+  const [ rows ] = await connect.execute(`DELETE FROM blacklist WHERE id = '${id}';`);
   connect.end();
   return rows;
 }

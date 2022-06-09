@@ -8,12 +8,12 @@ import { verifyJwt } from "./jwt";
  * @param ctx
  * @returns
  */
-export async function getAuthorization(ctx: Context) {
+export async function getAuthorization(ctx: Context, report = true) {
   const { authorization } = ctx.headers;
-  if (!authorization) throwError(ctx, 401);  // 获取不到
+  if (report && !authorization) throwError(ctx, 401);  // 获取不到
   const [ error, data ] = await asyncto(verifyJwt(authorization));
-  if (error) {
-    error === 'jwt expired' ? throwError(ctx, 403) : throwError(ctx, 500, error);
+  if (report && error) {
+    throwError(ctx, 403);
   }
   return data;
 }
@@ -23,8 +23,8 @@ export async function getAuthorization(ctx: Context) {
  * @param ctx
  * @param role 角色
  */
-export async function powerDetection(ctx: Context, role: string = '') {
+export async function powerDetection(ctx: Context, roles: string[]) {
   const user = await getAuthorization(ctx);
-  if (role && user && user.role !== role) throwError(ctx, 405);
+  if (user && !roles.includes(user.role)) throwError(ctx, 405);
   return user;
 }

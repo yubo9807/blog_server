@@ -3,6 +3,7 @@ import redis from './redis';
 import { sql_addBlockList, sql_queryBlockList } from '@/spider/blacklist';
 import { throwError } from "./errorDealWith";
 import { getClientIP } from '@/utils/network';
+import { getAuthorization } from "./authorization";
 
 let requestRate = 1;  // 请求频率
 
@@ -14,7 +15,7 @@ let requestRate = 1;  // 请求频率
  */
 async function requestCount(ctx: Context, time = 5000, maxRequestNumber = 20) {
 	const IP = ctx.request.ip;
-	const requestStr = await redis.deposit(`requestNumber_${IP}`, '请求次数', time, false, true);
+	const requestStr = await redis.deposit(`requestNumber_${IP}`, 1, time, false, true);
 
 	if (requestStr.cache) requestRate ++;
 	else {
@@ -36,18 +37,26 @@ async function requestCount(ctx: Context, time = 5000, maxRequestNumber = 20) {
 export default async function(ctx: Context) {
 	const key = Symbol('request_number');
 	const IP = getClientIP(ctx);
-	const queryBlackList = redis.deposit(key, async () => {
+	const queryBlackList = await redis.deposit(key, async () => {
 		return await sql_queryBlockList(IP);
 	});
 	if (queryBlackList[0]) {
-		throwError(ctx, 500, '您已被限制访问，请联系管理员', false);
+		// 不对超管登录进行限制
+		const { body } = ctx.request;
+		if (ctx.url === '/api/user/signIn' && body && body.username === 'yubo') return;
+
+		// 不对超管访问进行限制
+		const user = await getAuthorization(ctx, false);
+		if (user && user.role === 'super') return;
+
+		throwError(ctx, 500, `检测到您有恶意攻击行为，已被限制访问。IP： ${IP}`, false);
 	}
 	const beyondRefresh = await requestCount(ctx);
 	if (beyondRefresh) {
 		const { request_rate } = ctx.state;
-		if (request_rate > 100) {  // 请求频率超过100，加入黑名单
+		if (request_rate > 80) {  // 请求频率超过100，加入黑名单
 			await sql_addBlockList(IP, request_rate);
-			
+
 			// 覆盖掉缓存中的数据
 			await redis.deposit(key, async () => {
 				return await sql_queryBlockList(IP);
