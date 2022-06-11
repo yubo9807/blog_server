@@ -9,7 +9,7 @@ export async function sql_getUserList(name = null) {
   const connect = await connection();
   const [rows] = await connect.execute(
     name ? `SELECT id, name, role, portrait, mail, remark, create_time, is_receive FROM users WHERE name = ?;`
-    : `SELECT id, name, role, portrait, remark, create_time, is_receive FROM users;`,
+    : `SELECT id, name, role, portrait, mail, remark, create_time, is_receive FROM users;`,
     [name]
   );
   connect.end();

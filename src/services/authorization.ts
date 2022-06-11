@@ -25,6 +25,6 @@ export async function getAuthorization(ctx: Context, report = true) {
  */
 export async function powerDetection(ctx: Context, roles: string[]) {
   const user = await getAuthorization(ctx);
-  if (user && !roles.includes(user.role)) throwError(ctx, 405);
-  return user;
+  if (user && roles.includes(user.role)) return true;
+  else return false;
 }

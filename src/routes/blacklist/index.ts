@@ -6,7 +6,8 @@ const blacklist = new Router();
 
 // 获取黑名单
 blacklist.get('/', async (ctx, next) => {
-  await powerDetection(ctx, ['super']);
+  const isPower = await powerDetection(ctx, ['super']);
+  !isPower && throwError(ctx, 405);
 
   const rows = await sql_queryBlockList();
   ctx.body = rows;
@@ -15,7 +16,8 @@ blacklist.get('/', async (ctx, next) => {
 
 // 删除名单中的IP
 blacklist.delete('/', async (ctx, next) => {
-  await powerDetection(ctx, ['super']);
+  const isPower = await powerDetection(ctx, ['super']);
+  !isPower && throwError(ctx, 405);
 
   const { id } = ctx.request.body;
   if (!id) throwError(ctx, 406);

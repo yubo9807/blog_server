@@ -4,6 +4,7 @@ import { marked } from 'marked';
 
 import { pathConversion } from '@/env';
 import { throwError } from '@/services/errorDealWith';
+import { powerDetection } from '@/services/authorization';
 import File from '@/utils/file';
 import redis from '@/services/redis';
 import env from '@/env';
@@ -14,6 +15,12 @@ const read = new Router();
 // 获取文件夹下的文件夹和文件
 read.get('/', async(ctx, next) => {
   const { path } = ctx.query;
+  
+  if (typeof path === 'string' && path.startsWith('/logs')) {
+    const isPower = await powerDetection(ctx, ['super']);
+    !isPower && throwError(ctx, 405);
+  }
+
   const filename = pathConversion((path as string));
 
   !fs.existsSync(filename) && throwError(ctx, 500, '路径不存在');

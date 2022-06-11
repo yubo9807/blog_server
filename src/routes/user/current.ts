@@ -1,6 +1,5 @@
 import { Context } from "koa";
 import { throwError } from "../../services/errorDealWith";
-import { verifyJwt } from "../../services/jwt";
 import { sql_getUserList } from "../../spider/user";
 import { getAuthorization } from '@/services/authorization';
 
