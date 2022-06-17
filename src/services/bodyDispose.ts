@@ -25,8 +25,8 @@ export default async(ctx: Context, next: () => {}) => {
 	} catch (error) {
 		// code 依然为 400，说明错误并没有被捕获到
 		if (ctx.state.code === 400 && error) {
-			throwError(ctx, 400, null, false);
 			printErrorLogs(ctx, error);
+			throwError(ctx, 400, null, false);
 		}
 	}
 
