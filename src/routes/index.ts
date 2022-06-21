@@ -10,6 +10,7 @@ const routerList = [
 	{ url: '/blacklist', route: require('./blacklist') },
 	{ url: '/nozzle', route: require('./nozzle') },
 	{ url: '/access', route: require('./access') },
+	{ url: '/memory', route: require('./memory') },
 ]
 
 routerList.forEach(val => {

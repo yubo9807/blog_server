@@ -1,6 +1,7 @@
 import Router from '@koa/router';
 import { sql_getFriendLinkList, sql_addFriendLink, sql_deleteFriendLink, sql_modifyFriendLink } from '../../spider/friendLink';
 import { throwError } from '../../services/errorDealWith';
+import { powerDetection } from '@/services/authorization';
 const friendLink = new Router();
 
 // 获取友链列表
@@ -11,6 +12,9 @@ friendLink.get('/', async(ctx, next) => {
 
 // 删除友链
 friendLink.delete('/', async(ctx, next) => {
+  const isPower = await powerDetection(ctx, ['super']);
+  !isPower && throwError(ctx, 405);
+
   const { id } = ctx.request.body;
   if (!id) {
     throwError(ctx, 406, 'params error');
@@ -21,6 +25,9 @@ friendLink.delete('/', async(ctx, next) => {
 
 // 添加友链
 friendLink.post('/', async(ctx, next) => {
+  const isPower = await powerDetection(ctx, ['super']);
+  !isPower && throwError(ctx, 405);
+
   const { name, link, remark } = ctx.request.body;
   if (!name || !link) {
     throwError(ctx, 406, 'params error');
@@ -32,6 +39,9 @@ friendLink.post('/', async(ctx, next) => {
 
 // 修改友链
 friendLink.put('/', async(ctx, next) => {
+  const isPower = await powerDetection(ctx, ['super']);
+  !isPower && throwError(ctx, 405);
+
   const { id, name, link, remark } = ctx.request.body;
   const params = {
     id,

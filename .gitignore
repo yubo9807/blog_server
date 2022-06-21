@@ -3,6 +3,7 @@ node_modules
 /public/note
 /public/vise
 /public/logs
+/public/access-record
 _power.ts
 dist
 .idea

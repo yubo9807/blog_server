@@ -26,33 +26,39 @@ export default {
   },
 
   /**
+   * 清空数据
+   */
+  clear() {
+    cache.clear();
+  },
+
+  /**
    * 清除数据（过期的，早以前的）
    */
-  clearCache: redis.clearCache,
-
-  /**
-   * 删除过期的数据
-   */
-  deleteFristValue: redis.deleteFristValue,
-
-  /**
-   * 删除最早缓存的数据
-   */
-  deleteOverValue: redis.deleteOverValue,
-
+  clearCache() {
+    redis.clearCache();
+  },
+  
   /**
    * 获取数据存储大小
    */
-  size: cache.size,
+  size() {
+    return cache.size();
+  },
 
   /**
    * 获取存储的所有数据
    */
-  gainAll: cache.gainAll,
+  gainAll() {
+    this.clearCache();
+    return cache.gainAll();
+  },
 
   /**
    * 获取数据长度
    */
-  length: cache.length,
+  length() {
+    return cache.length();
+  },
 
 }

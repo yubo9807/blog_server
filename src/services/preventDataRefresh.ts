@@ -14,7 +14,7 @@ let requestRate = 1;  // 请求频率
  * @param maxRequestNumber 允许最大请求数
  */
 async function requestCount(ctx: Context, time = 5000, maxRequestNumber = 20) {
-	const IP = ctx.request.ip;
+	const IP = getClientIP(ctx);
 	const requestStr = await redis.deposit(`requestNumber_${IP}`, 1, time, false, true);
 
 	if (requestStr.cache) requestRate ++;
@@ -34,8 +34,9 @@ async function requestCount(ctx: Context, time = 5000, maxRequestNumber = 20) {
 }
 
 
+const key = 'blacklist';
+
 export default async function(ctx: Context) {
-	const key = Symbol('request_number');
 	const IP = getClientIP(ctx);
 	const queryBlackList = await redis.deposit(key, async () => {
 		return await sql_queryBlockList(IP);

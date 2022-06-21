@@ -23,7 +23,7 @@ export function getNowDate(timestamp: Date | number = Date.now()) {
  * @param formater 
  * @param t 
  */
- export const dateFormater = (formater: string = 'YYYY-MM-DD hh:mm:ss', t: string | Date = new Date()) => {
+ export const dateFormater = (formater: string = 'YYYY-MM-DD hh:mm:ss', t: string | number | Date = new Date()) => {
   const {year, month, day, hour, minute, second} = getCurrentDate(t);
   return formater.replace(/YYYY/g, year)
   .replace(/YY/g, year.substr(2, 2))
@@ -48,4 +48,17 @@ export function switchTimeFormat (time: Date | string) {
     const minute = dateTime.getMinutes();
     const second = dateTime.getSeconds();
     return `${year}-${addZero(month)}-${addZero(date)} ${addZero(hour)}:${addZero(minute)}:${addZero(second)}`;
+}
+
+
+/**
+ * 获取当月的天数
+ * @param time 格式：2022-5
+ */
+export function getMonthDays(time: string | null = null) {
+  const date = new Date(time);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const d = new Date(year, month, 0);
+  return d.getDate();
 }
