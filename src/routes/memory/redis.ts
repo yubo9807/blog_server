@@ -21,8 +21,11 @@ route.delete('/', async(ctx, next) => {
   
   const isPower = await powerDetection(ctx, ['super']);
   !isPower && throwError(ctx, 405);
+  
+  const { key } = ctx.request.body;
 
-  redis.clear();
+  if (key) redis.delete(key);
+  else redis.clear();
 
   ctx.body = 'success';
   next();

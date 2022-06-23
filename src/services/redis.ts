@@ -32,6 +32,10 @@ export default {
     cache.clear();
   },
 
+  delete(key: string | symbol) {
+    cache.delete(key)
+  },
+
   /**
    * 清除数据（过期的，早以前的）
    */
