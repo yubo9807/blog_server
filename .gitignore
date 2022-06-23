@@ -4,6 +4,7 @@ node_modules
 /public/vise
 /public/logs
 /public/access-record
+/public/sitemap.xml
 _power.ts
 dist
 .idea
