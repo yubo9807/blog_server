@@ -36,7 +36,7 @@ socket(server);
 router.use(env.BASE_API, routeConfig.routes());
 app.use(router.routes());
 
-// // 静态资源
+// 静态资源
 app.use(koaStatic(pathConversion()));
 
 const ip4 = getIP4Address();

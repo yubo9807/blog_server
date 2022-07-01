@@ -11,6 +11,7 @@ const routerList = [
 	{ url: '/nozzle', route: require('./nozzle') },
 	{ url: '/access', route: require('./access') },
 	{ url: '/memory', route: require('./memory') },
+	{ url: '/os', route: require('./os') },
 ]
 
 routerList.forEach(val => {

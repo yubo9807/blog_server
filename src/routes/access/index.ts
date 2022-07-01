@@ -33,8 +33,9 @@ access.get('/', async (ctx, next) => {
   for await (const name of filenameList) {
     const content: string = await file.getContent(`${baseFilename}/${name}.log`);
     const json = JSON.parse(`[${content.trim().slice(0, -1)}]`);
-    list = list.concat(list, json);
+    list.push(json);
   }
+  list = list.flat(1);
 
   const len = list.length;
   if (len > 0 && (startTime || endTime)) {
