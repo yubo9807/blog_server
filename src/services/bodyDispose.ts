@@ -1,3 +1,4 @@
+import { choke } from '@/utils/optimize';
 import { Context } from 'koa';
 import env from '../env';
 import { throwError } from './errorDealWith';

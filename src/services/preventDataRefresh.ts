@@ -19,7 +19,6 @@ async function requestCount(ctx: Context, time = 5000, maxRequestNumber = 20) {
 
 	if (requestStr.cache) requestRate ++;
 	else {
-    // console.log(Math.floor(Date.now() / 1000), requestRate);
 		// 重置次数前记录下请求次数
 		requestRate = 1;
 	}

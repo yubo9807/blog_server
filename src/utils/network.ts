@@ -17,6 +17,11 @@ export function asyncto(promise: Promise<any>, errorExt: string = '') {
     })
 }
 
+/**
+ * 获取客户端IP
+ * @param ctx 
+ * @returns 
+ */
 export function getClientIP(ctx: Context) {
   const { request } = ctx;
   const ip = request.headers['x-real-ip'];
