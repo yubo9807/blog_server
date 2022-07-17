@@ -16,7 +16,8 @@ const read = new Router();
 read.get('/', async(ctx, next) => {
   const { path } = ctx.query;
   
-  if (typeof path === 'string' && path.startsWith('/logs')) {
+  // 获取的是日志文件，添加权限
+  if ((path as string).startsWith('/logs')) {
     const isPower = await powerDetection(ctx, ['super']);
     !isPower && throwError(ctx, 405);
   }
@@ -24,11 +25,17 @@ read.get('/', async(ctx, next) => {
   const filename = pathConversion((path as string));
 
   !fs.existsSync(filename) && throwError(ctx, 500, '路径不存在');
+  let body = '';
 
-  const body = await redis.deposit(ctx, async() => {
-    return await getFileContentOrChildDirectory(filename);
-  }, 1000 * 60 * 20);
-  
+  // 对笔记文件做缓存
+  if ((path as string).startsWith('/note')) {
+    body = await redis.deposit(ctx, async() => {
+      return await getFileContentOrChildDirectory(filename);
+    }, 1000 * 60 * 20);
+  }
+
+  body = await getFileContentOrChildDirectory(filename);
+
   ctx.body = body;
   next();
 })

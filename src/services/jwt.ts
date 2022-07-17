@@ -1,17 +1,17 @@
 import { sign, verify, SignOptions } from 'jsonwebtoken';
 import { jwtKey } from '../_power';
 
-const OVERDUETIME = 60 * 60 * 24 * 2;  // 默认过期时间：2天
+const defaultOption = {
+  expiresIn: '2 days',  // 默认过期时间：2天
+}
 
 /**
  * 颁发 jwt
  * @param info 
  * @returns 
  */
-export function publishJwt(info: any, options: SignOptions = {}) {
-  return sign(info, jwtKey, Object.assign({
-    expiresIn: OVERDUETIME,
-  }, options));
+export function publishJwt(info: any, options: SignOptions = defaultOption) {
+  return sign(info, jwtKey, options);
 }
 
 /**

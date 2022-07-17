@@ -1,9 +1,9 @@
 import { Context } from "koa";
-import { throwError } from "../../services/errorDealWith";
-import { publishJwt } from "../../services/jwt";
-import redis from "../../services/redis";
-import { sql_addUser, sql_queryUserData } from "../../spider/user";
-import { getNowDate } from '../../utils/date';
+import { throwError } from "@/services/errorDealWith";
+import { publishJwt } from "@/services/jwt";
+import redis from "@/services/redis";
+import { sql_addUser, sql_queryUserData } from "@/spider/user";
+import { getNowDate } from '@/utils/date';
 
 export default async(ctx: Context, next: Function) => {
   const { username, password, mail, mailCode, isReceive } = ctx.request.body;
@@ -33,7 +33,7 @@ export default async(ctx: Context, next: Function) => {
     }
   }
 
-  const pass = publishJwt(password);
+  const pass = publishJwt(password, null);
   const params = {
     name: username,
     pass: pass,
