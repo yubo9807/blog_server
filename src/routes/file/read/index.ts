@@ -14,21 +14,21 @@ const read = new Router();
 
 // 获取文件夹下的文件夹和文件
 read.get('/', async(ctx, next) => {
-  const { path } = ctx.query;
+  const path = decodeURI(ctx.query.path as string);
   
   // 获取的是日志文件，添加权限
-  if ((path as string).startsWith('/logs')) {
+  if (path.startsWith('/logs')) {
     const isPower = await powerDetection(ctx, ['super']);
     !isPower && throwError(ctx, 405);
   }
 
-  const filename = pathConversion((path as string));
+  const filename = pathConversion(path);
 
   !fs.existsSync(filename) && throwError(ctx, 500, '路径不存在');
   let body = '';
 
   // 对笔记文件做缓存
-  if ((path as string).startsWith('/note')) {
+  if (path.startsWith('/note')) {
     body = await redis.deposit(ctx, async() => {
       return await getFileContentOrChildDirectory(filename);
     }, 1000 * 60 * 20);
