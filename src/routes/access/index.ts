@@ -15,7 +15,7 @@ access.get('/', async (ctx, next) => {
   const { startTime, endTime } = ctx.query;
 
   const file = new File();
-  const baseFilename = pathConversion('/access-record');
+  const baseFilename = pathConversion('/access');
   let list = [];
 
   let filenameList = (await file.getChildren(baseFilename)).map(val => val.name.replace('.log', ''));
@@ -67,7 +67,7 @@ export = access;
 
 
 function createAccessRecord(filename: string, data: string) {
-  const folder = `${env.BASE_PUBLIC}/access-record`;
+  const folder = `${env.BASE_PUBLIC}/access`;
   fs.stat(folder, e => {  // 文件是否存在
     if (e?.code === 'ENOENT') fs.mkdirSync(folder);
 

@@ -11,7 +11,7 @@ let env = {
 
   NODE_ENV: process.env.NODE_ENV || PRODUCTION,
 
-  BASE_PUBLIC: path.resolve(__dirname, '../public'),  // 静态资源目录
+  BASE_PUBLIC: path.resolve(__dirname, '../../public'),  // 静态资源目录
 
   BASE_ROOT: path.resolve(__dirname, '../'),  // 根目录
 

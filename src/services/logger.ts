@@ -12,7 +12,7 @@ import { getClientIP } from '@/utils/network';
  * @param logs
  */
 export async function createLogger(filename: string, ...logs: any) {
-  const folder = `${env.BASE_PUBLIC}/logs`;
+  const folder = `${env.BASE_ROOT}/logs`;
   fs.stat(folder, e => {
     if (e?.code === 'ENOENT') fs.mkdirSync(folder);
 
