@@ -21,7 +21,7 @@ let env = {
 
   BASE_SOCKET: BASEAPI + '/socket',
 
-  CORS_ORIGIN: 'http://hpyyb.cn/',  // 允许访问IP
+  CORS_ORIGIN: 'http://hpyyb.cn',  // 允许访问IP
 
 }
 
@@ -41,7 +41,11 @@ moduleAlias.addAliases({
 
 export default env;
 
-// 拼接静态资源目录
+/**
+ * 拼接静态资源目录
+ * @param url 拼接url
+ * @returns 
+ */
 export function pathConversion(url: string = '') {
   return env.BASE_PUBLIC + url.replace(/\//g, path.sep);
 }

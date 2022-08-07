@@ -2,45 +2,54 @@ import fs from 'fs';
 import Router from '@koa/router';
 import { marked } from 'marked';
 
-import { pathConversion } from '@/env';
+import env, { pathConversion } from '@/env';
 import { throwError } from '@/services/errorDealWith';
 import { powerDetection } from '@/services/authorization';
 import File from '@/utils/file';
 import redis from '@/services/redis';
-import env from '@/env';
 
-const read = new Router();
+const rouer = new Router();
 
 
 // 获取文件夹下的文件夹和文件
-read.get('/', async(ctx, next) => {
+rouer.get('/', async(ctx, next) => {
   const path = decodeURI(ctx.query.path as string);
-  
-  // 获取的是日志文件，添加权限
-  if (path.startsWith('/logs')) {
-    const isPower = await powerDetection(ctx, ['super']);
-    !isPower && throwError(ctx, 405);
-  }
-
-  const filename = pathConversion(path);
-
+  let filename = pathConversion(path);
   !fs.existsSync(filename) && throwError(ctx, 500, '路径不存在');
+
   let body = '';
 
   // 对笔记文件做缓存
   if (path.startsWith('/note')) {
     body = await redis.deposit(ctx, async() => {
-      return await getFileContentOrChildDirectory(filename);
+      return await getFileContentOrChildDirectory(filename, env.BASE_PUBLIC);
     }, 1000 * 60 * 20);
   }
 
-  body = await getFileContentOrChildDirectory(filename);
+  body = await getFileContentOrChildDirectory(filename, env.BASE_PUBLIC);
 
   ctx.body = body;
   next();
 })
 
-export = read;
+
+rouer.get('/logs', async(ctx, next) => {
+  const path = decodeURI(ctx.query.path as string);
+  const baseUrl = env.BASE_ROOT + '/logs';
+  let filename = baseUrl + path;
+  
+  // 获取的是日志文件，添加权限
+  const isPower = await powerDetection(ctx, ['super']);
+  !isPower && throwError(ctx, 405);
+
+  !fs.existsSync(filename) && throwError(ctx, 500, '路径不存在');
+  const body = await getFileContentOrChildDirectory(filename, baseUrl);
+
+  ctx.body = body;
+  next();
+})
+
+export = rouer;
 
 
 
@@ -49,13 +58,13 @@ export = read;
  * @param filename 
  * @returns 
  */
-async function getFileContentOrChildDirectory(filename: string) {
+async function getFileContentOrChildDirectory(filename: string, replacePath = '') {
   let body: any;
   
   const fileAttr: any = await File.getStat(filename);
   
   if (fileAttr.isFile) {
-    fileAttr.path = fileAttr.filename.replace(env.BASE_PUBLIC, '');
+    fileAttr.path = fileAttr.filename.replace(replacePath, '');
 
     // 是文件，返回文件内容
     const file = new File();
@@ -69,7 +78,7 @@ async function getFileContentOrChildDirectory(filename: string) {
     const file = new File();
     const arr = await file.getChildren(filename);
     arr.forEach(val => {
-      val.path = val.filename.replace(env.BASE_PUBLIC, '');
+      val.path = val.filename.replace(replacePath, '');
     });
 
     // 排序
