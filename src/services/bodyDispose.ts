@@ -1,22 +1,25 @@
 import { choke } from '@/utils/optimize';
-import { Context } from 'koa';
+import { Context, Next } from 'koa';
 import env from '../env';
 import { throwError } from './errorDealWith';
 import { printErrorLogs } from './logger';
 import preventDataRefresh from './preventDataRefresh';
 
-export default async(ctx: Context, next: () => {}) => {
+/**
+ * 中间件 处理 body 数据
+ */
+export default async(ctx: Context, next: Next) => {
 
 	if (!ctx.originalUrl.startsWith(env.BASE_API)) {
 		return await next();
 	};
-
+	
 	const startTime = Date.now();
 	ctx.state.code = 400;
 	ctx.state.msg = '';
 	ctx.state.request_rate = 1;  // 请求频率
 	ctx.state.redis_cache = false;
-
+	
 	// 数据防刷
 	await preventDataRefresh(ctx);
 	
@@ -30,17 +33,17 @@ export default async(ctx: Context, next: () => {}) => {
 			throwError(ctx, 400, null, false);
 		}
 	}
-
+	
 	// 等待所有中间件完成后执行，规范数据格式
 	const { state, body } = ctx;
 	const endTime = Date.now();
-
+	
 	if (state.msg == '' && !body) {  // 没错误消息，也没body
 		throwError(ctx, 404, null, false);
 	} else if (body) {  // 正常返回数据
 		ctx.body = {
 			code: 200,
-			msg: 'success',
+			msg: '',
 			data: body,
 			redis_cache: state.redis_cache,  // 是否具有缓存
 			request_rate: state.request_rate,  // 请求频率 10/5s

@@ -1,21 +1,19 @@
 import { throwError } from '@/services/errorDealWith';
 import Router from '@koa/router';
-import logger, { LogLevel } from 'logger';
-import { dateFormater, getMonthDays } from '@/utils/date';
-import { isType } from '@/utils/judge';
+import { dateFormater, getNowDate } from '@/utils/date';
 import File from '@/utils/file';
-import fs from 'fs';
-import env, { pathConversion } from '@/env';
+import { pathConversion } from '@/env';
+import { createAccessRecord } from '@/services/access-record';
 
 const access = new Router();
+const file = new File();
+const baseFilename = pathConversion('/access');
 
 
 // 获取访问记录
 access.get('/', async (ctx, next) => {
   const { startTime, endTime } = ctx.query;
 
-  const file = new File();
-  const baseFilename = pathConversion('/access');
   let list = [];
 
   let filenameList = (await file.getChildren(baseFilename)).map(val => val.name.replace('.log', ''));
@@ -53,29 +51,22 @@ access.get('/', async (ctx, next) => {
 
 // 记录访问信息
 access.post('/', async(ctx, next) => {
-  const { info } = ctx.request.body;
+  const { url, ip, userAgent } = ctx.request.body;
   
-  if (!info || isType(info) !== 'object') throwError(ctx, 406);
+  if (typeof url !== 'string' || url === '') throwError(ctx, 406);
 
-  createAccessRecord(dateFormater('YYYY-MM-DD', Date.now()), JSON.stringify(info) + ',');
+  const data = {
+    url,
+    accessTime: getNowDate(),
+    ip,
+    userAgent,
+  }
+
+  const filename = dateFormater('YYYY-MM-DD', Date.now());
+  createAccessRecord(filename, JSON.stringify(data) + ',');
 
   ctx.body = 'success';
   next();
 })
 
 export = access;
-
-
-function createAccessRecord(filename: string, data: string) {
-  const folder = `${env.BASE_PUBLIC}/access`;
-  fs.stat(folder, e => {  // 文件是否存在
-    if (e?.code === 'ENOENT') fs.mkdirSync(folder);
-
-    const log = logger.createLogger(`${folder}/${filename}.log`);
-    log.format = function(level: LogLevel, date: Date | string, message: string) {
-      return message;
-    };
-    log.info(data);
-    
-  });
-}

@@ -7,6 +7,7 @@ import Router from '@koa/router';
 import chalk from 'chalk';
 import { notify } from 'node-notifier';
 
+import accessRecord from './services/access-record';
 import koaStatic from './services/koaStatic';
 import routeConfig from './routes';
 import bodyDispose from './services/bodyDispose';
@@ -27,7 +28,8 @@ app.use(bodyParser());
 
 const router = new Router();
 
-app.use(bodyDispose);  // 处理返回 body 数据
+app.use(bodyDispose);
+// app.use(accessRecord);
 
 // webSocket
 socket(server);
