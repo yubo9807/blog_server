@@ -1,8 +1,7 @@
 import { Context, Next } from 'koa';
-import env from '../env';
-import { throwError } from '../services/errorDealWith';
-import { printErrorLogs } from '../services/logger';
-import preventDataRefresh from '../services/preventDataRefresh';
+import env from '@/env';
+import { throwError } from '@/services/errorDealWith';
+import { printErrorLogs } from '@/services/logger';
 
 /**
  * 中间件：处理 body 数据
@@ -18,9 +17,6 @@ export default async(ctx: Context, next: Next) => {
 	ctx.state.msg = '';
 	ctx.state.request_rate = 1;  // 请求频率
 	ctx.state.redis_cache = false;
-	
-	// 数据防刷
-	await preventDataRefresh(ctx);
 	
 	// 捕获错误，打印日志
 	try {

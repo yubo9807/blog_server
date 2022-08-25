@@ -14,6 +14,7 @@ import bodyDispose from './middleware/body-dispose';
 import socket from './socket';
 import { getIP4Address } from './utils/inspect';
 import proxy from './proxy';
+import preventDataRefresh from './middleware/prevent-data-refresh';
 
 const app = new koa();
 const server = http.createServer(app.callback());
@@ -23,6 +24,9 @@ app.use(proxy);
 
 app.use(cors({ origin: env.CORS_ORIGIN }));  // 设置跨域
 app.use(bodyParser());  // 接收 body 数据
+
+// 数据放刷
+app.use(preventDataRefresh);
 
 // 返回数据处理
 app.use(bodyDispose);
