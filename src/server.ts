@@ -7,10 +7,10 @@ import Router from '@koa/router';
 import chalk from 'chalk';
 import { notify } from 'node-notifier';
 
-import accessRecord from './services/access-record';
+import accessRecord from './middleware/access-record';
 import koaStatic from './services/koaStatic';
 import routeConfig from './routes';
-import bodyDispose from './services/bodyDispose';
+import bodyDispose from './middleware/body-dispose';
 import socket from './socket';
 import { getIP4Address } from './utils/inspect';
 import proxy from './proxy';
@@ -18,28 +18,28 @@ import proxy from './proxy';
 const app = new koa();
 const server = http.createServer(app.callback());
 
+// 代理接口
 app.use(proxy);
 
-app.use(cors({
-	origin: env.CORS_ORIGIN,
-	credentials: true,
-}));
-app.use(bodyParser());
+app.use(cors({ origin: env.CORS_ORIGIN }));  // 设置跨域
+app.use(bodyParser());  // 接收 body 数据
 
-const router = new Router();
-
+// 返回数据处理
 app.use(bodyDispose);
-// app.use(accessRecord);
 
 // webSocket
 socket(server);
 
 // 路由配置
+const router = new Router();
 router.use(env.BASE_API, routeConfig.routes());
 app.use(router.routes());
 
 // 静态资源
 app.use(koaStatic(pathConversion()));
+
+// 访问记录
+app.use(accessRecord);
 
 const ip4 = getIP4Address();
 const prot = 20010;

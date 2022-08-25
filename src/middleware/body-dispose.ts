@@ -1,12 +1,11 @@
-import { choke } from '@/utils/optimize';
 import { Context, Next } from 'koa';
 import env from '../env';
-import { throwError } from './errorDealWith';
-import { printErrorLogs } from './logger';
-import preventDataRefresh from './preventDataRefresh';
+import { throwError } from '../services/errorDealWith';
+import { printErrorLogs } from '../services/logger';
+import preventDataRefresh from '../services/preventDataRefresh';
 
 /**
- * 中间件 处理 body 数据
+ * 中间件：处理 body 数据
  */
 export default async(ctx: Context, next: Next) => {
 

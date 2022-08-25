@@ -36,5 +36,6 @@ export default function (root: string) {
         // 得到文件内容
         ctx.body = fs.createReadStream(filename);
         ctx.type = getType(filename);
+        next();
     };
 };

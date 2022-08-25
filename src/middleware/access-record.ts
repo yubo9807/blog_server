@@ -5,7 +5,7 @@ import fs from 'fs';
 import env from '@/env';
 
 /**
- * 中间件，日志记录
+ * 中间件：日志记录
  */
 export default async (ctx: Context, next: Next) => {
 
@@ -16,7 +16,7 @@ export default async (ctx: Context, next: Next) => {
     url: url,
     accessTime: getNowDate(),
     ip: headers['x-forwarded-for'],
-    userAgent: headers['user-agent']
+    userAgent: headers['user-agent'],
   };
 
   for (const key in data) {

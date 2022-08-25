@@ -3,7 +3,7 @@ import Router from '@koa/router';
 import { dateFormater, getNowDate } from '@/utils/date';
 import File from '@/utils/file';
 import { pathConversion } from '@/env';
-import { createAccessRecord } from '@/services/access-record';
+import { createAccessRecord } from '@/middleware/access-record';
 
 const access = new Router();
 const file = new File();

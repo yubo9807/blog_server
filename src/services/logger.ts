@@ -32,7 +32,7 @@ export async function createLogger(filename: string, ...logs: any) {
  * @param error 
  */
 export function printErrorLogs(ctx: Context, error: string | Error) {
-  const { url, query, request, state, method, headers } = ctx;
+  const { url, request, method, headers } = ctx;
   const day = dateFormater('YYYY-MM-DD');
 
   const arr = [
