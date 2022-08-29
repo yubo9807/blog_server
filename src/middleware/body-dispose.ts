@@ -14,6 +14,7 @@ export default async(ctx: Context, next: Next) => {
 	
 	const startTime = Date.now();
 	ctx.state.code = 400;
+	ctx.state.msg = '';
 	ctx.state.redis_cache = false;
 	
 	// 捕获错误，打印日志

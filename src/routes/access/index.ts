@@ -51,13 +51,14 @@ access.get('/', async (ctx, next) => {
 
 // 记录访问信息
 access.post('/', async(ctx, next) => {
-  const { url, ip, userAgent } = ctx.request.body;
+  const { host, url, ip, userAgent } = ctx.request.body;
   
   if (typeof url !== 'string' || url === '') throwError(ctx, 406);
 
   const data = {
-    url,
     accessTime: getNowDate(),
+    url,
+    host,
     ip,
     userAgent,
   }
