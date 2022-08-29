@@ -7,7 +7,7 @@ import connection from './connection';
  * @param requestNumber 请求次数
  * @returns 
  */
-export async function sql_addBlockList(ip: string, requestNumber: number) {
+export async function sql_addBlockList(ip: string, requestNumber: number = 0) {
   const createTime = getNowDate();
   const connect = await connection();
   const [ rows ] = await connect.execute(`INSERT INTO blacklist (ip, create_time, request_number) VALUES(?, ?, ?);`, [ ip, createTime, requestNumber ]);

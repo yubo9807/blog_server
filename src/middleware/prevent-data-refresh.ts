@@ -5,16 +5,20 @@ import { sql_addBlockList, sql_queryBlockList } from "@/spider/blacklist";
 import { getClientIP } from "@/utils/network";
 import { Context, Next } from "koa";
 
+
 /**
- * 中间件：数据放刷
+ * 中间件：数据防刷
  */
-export default async (ctx: Context, next: Next) => {
+export default async(ctx: Context, next: Next) => {
 
   const IP = getClientIP(ctx);
-	const queryBlackList = await redis.deposit(key, async () => {
-		return await sql_queryBlockList(IP);
+	const key = `blacklist`;
+
+	const blackList = await redis.deposit(key, async () => {
+		return await sql_queryBlockList();
 	});
-	if (queryBlackList[0]) {
+	const index = blackList.find(val => val.ip === IP);
+	if (index >= 0) {
 		// 不对登录进行限制
 		const { body } = ctx.request;
 		if (ctx.url === '/api/user/signIn' && body && body.username === 'yubo') return;
@@ -25,21 +29,24 @@ export default async (ctx: Context, next: Next) => {
 
 		throwError(ctx, 500, `检测到您有恶意攻击行为，已被限制访问。IP： ${IP}`, false);
 	}
-	const beyondRefresh = await requestCount(ctx);
-	if (beyondRefresh) {
-		const { request_rate } = ctx.state;
-		if (request_rate > 80) {  // 请求频率过高，加入黑名单
-			await sql_addBlockList(IP, request_rate);
 
-			// 覆盖掉缓存中的数据
-			await redis.deposit(key, async () => {
-				return await sql_queryBlockList(IP);
-			}, -1, true);
-		}
-		throwError(ctx, 513, null, false);
+	const beyond = await requestCount(ctx);
+	if (!beyond) {
+		await next();
+		return;
 	}
 
-  await next();
+	const { request_rate } = ctx.state;
+	if (request_rate > 80) {  // 请求频率过高，加入黑名单
+		await sql_addBlockList(IP, request_rate);
+
+		// 覆盖缓存中黑名单数据
+		await redis.deposit(key, async() => {
+			return await sql_queryBlockList();
+		}, -1, true);
+	}
+	throwError(ctx, 513, null, false);
+
 }
 
 
@@ -51,15 +58,13 @@ let requestRate = 1;  // 请求频率
  * @param time 一定时间内（ms）
  * @param maxRequestNumber 允许最大请求数
  */
-async function requestCount(ctx: Context, time = 5000, maxRequestNumber = 20) {
+async function requestCount(ctx: Context, time = 5000, maxRequestNumber = 30) {
 	const IP = getClientIP(ctx);
-	const requestStr = await redis.deposit(`requestNumber_${IP}`, 1, time, false, true);
+	const key = `requestNumber_${IP}`
+	const requestStr = await redis.deposit(key, requestRate, time, false, true);
 
-	if (requestStr.cache) requestRate ++;
-	else {
-		// 重置次数前记录下请求次数
-		requestRate = 1;
-	}
+	requestRate = requestStr.cache ? requestRate+1 : 1;
+	redis.deposit(key, requestRate, time, true);
 
   ctx.state.request_rate = requestRate;
 
@@ -69,6 +74,3 @@ async function requestCount(ctx: Context, time = 5000, maxRequestNumber = 20) {
 	}
   return false;
 }
-
-
-const key = 'blacklist';

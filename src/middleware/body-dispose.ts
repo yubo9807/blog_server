@@ -14,8 +14,6 @@ export default async(ctx: Context, next: Next) => {
 	
 	const startTime = Date.now();
 	ctx.state.code = 400;
-	ctx.state.msg = '';
-	ctx.state.request_rate = 1;  // 请求频率
 	ctx.state.redis_cache = false;
 	
 	// 捕获错误，打印日志
@@ -41,7 +39,7 @@ export default async(ctx: Context, next: Next) => {
 			msg: '',
 			data: body,
 			redis_cache: state.redis_cache,  // 是否具有缓存
-			request_rate: state.request_rate,  // 请求频率 10/5s
+			request_rate: state.request_rate,  // 请求频率
 			run_time: endTime - startTime,  // 代码执行时间
 		}
 	} else {  // 其他异常情况，自行设置 code msg 进行处理

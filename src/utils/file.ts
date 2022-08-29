@@ -15,7 +15,7 @@ export default class File {
   /**
    * 获取文件属性
    */
-   static async getStat(filename: string) {
+  static async getStat(filename: string) {
     const [ err, stat ] = await asyncto(fs.promises.stat(filename));
     if (err) return Promise.reject(err);
 
@@ -23,8 +23,8 @@ export default class File {
       filename,
       isFile: stat.isFile(),  // 是否为文件
       size: stat.size,
-		  createTime: getNowDate(stat.birthtime),
-		  updataTime: getNowDate(stat.mtime),
+      createTime: getNowDate(stat.birthtime),
+      updataTime: getNowDate(stat.mtime),
       name: path.basename(filename),  // 文件名
 		  ext: path.extname(filename),  // 文件后缀
     })
@@ -46,7 +46,7 @@ export default class File {
     isBuffer
       ? fileContent = await fs.promises.readFile(filename)
       : fileContent = await fs.promises.readFile(filename, 'utf8');
-    
+
     return Promise.resolve(fileContent);
   }
 

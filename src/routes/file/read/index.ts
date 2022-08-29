@@ -15,7 +15,7 @@ const rouer = new Router();
 rouer.get('/', async(ctx, next) => {
   const path = decodeURI(ctx.query.path as string);
   let filename = pathConversion(path);
-  !fs.existsSync(filename) && throwError(ctx, 500, '路径不存在');
+  !fs.existsSync(filename) && throwError(ctx, 500, '文件路径不存在');
 
   let body = '';
 

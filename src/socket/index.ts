@@ -3,6 +3,9 @@ import env from '../env';
 import { createLogger } from '@/services/logger';
 import { dateFormater } from '@/utils/date';
 
+/**
+ * socket
+ */
 export default async(server) => {
   try {
     chat(server, env.BASE_SOCKET + '/chat');

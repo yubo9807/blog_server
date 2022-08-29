@@ -12,4 +12,7 @@ const options = {
 	}
 };
 
+/**
+ * 中间件：接口代理
+ */
 export default proxy(options);
