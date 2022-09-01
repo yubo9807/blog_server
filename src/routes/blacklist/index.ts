@@ -25,6 +25,9 @@ route.post('/', async(ctx, next) => {
   const { ip } = ctx.request.body;
   if (!ip) throwError(ctx, 406);
 
+  const rows = await sql_queryBlockList(ip);
+  if (rows[0]) throwError(ctx, 500, 'ip 已存在');
+
 	await sql_addBlockList(ip);
 
   redis.deposit('blacklist', async() => {
