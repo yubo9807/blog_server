@@ -5,19 +5,20 @@ import { sql_addBlockList, sql_queryBlockList } from "@/spider/blacklist";
 import { getClientIP } from "@/utils/network";
 import { Context, Next } from "koa";
 
+let lock = false;
 
 /**
  * 中间件：数据防刷
  */
 export default async(ctx: Context, next: Next) => {
 
-  const IP = getClientIP(ctx);
+	const IP = getClientIP(ctx);
 	const key = `blacklist`;
 
 	const blackList = await redis.deposit(key, async () => {
 		return await sql_queryBlockList();
 	});
-	const index = blackList.find(val => val.ip === IP);
+	const index = blackList.findIndex(val => val.ip === IP);
 	if (index >= 0) {
 		// 不对登录进行限制
 		const { body } = ctx.request;
@@ -31,13 +32,16 @@ export default async(ctx: Context, next: Next) => {
 	}
 
 	const beyond = await requestCount(ctx);
-	if (!beyond) {
-		await next();
-		return;
+	if (beyond) {
+		lock && throwError(ctx, 500, '检测到有攻击行为，系统暂时进入保护模式！请稍后重试', false);
+	} else {
+		lock = false;  // 请求频次刷新，关闭锁
+		return await next();
 	}
 
 	const { request_rate } = ctx.state;
-	if (request_rate > 80) {  // 请求频率过高，加入黑名单
+	if (request_rate > 80 && !lock) {  // 请求频率过高，加入黑名单
+		lock = true;  // 加锁，防止并发请求次数持续升高
 		await sql_addBlockList(IP, request_rate);
 
 		// 覆盖缓存中黑名单数据
