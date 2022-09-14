@@ -27,7 +27,8 @@ export function throwError(ctx: Context, code: number = 500, msg: string = 'busi
     // 5xx 给用户看的错误
     500: msg,  // 业务逻辑错误
     501: '暂不支持业务功能',
-    513: '服务器忙，请稍后重试',
+    503: '服务器忙，请稍后重试',
+    508: '检测到有攻击行为，系统暂时进入保护模式！请稍后重试',
 
   }
 

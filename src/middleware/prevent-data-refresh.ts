@@ -33,7 +33,7 @@ export default async(ctx: Context, next: Next) => {
 
 	const beyond = await requestCount(ctx);
 	if (beyond) {
-		lock && throwError(ctx, 500, '检测到有攻击行为，系统暂时进入保护模式！请稍后重试', false);
+		lock && throwError(ctx, 508, null, false);
 	} else {
 		lock = false;  // 请求频次刷新，关闭锁
 		return await next();
@@ -49,7 +49,7 @@ export default async(ctx: Context, next: Next) => {
 			return await sql_queryBlockList();
 		}, -1, true);
 	}
-	throwError(ctx, 513, null, false);
+	throwError(ctx, 503, null, false);
 
 }
 
