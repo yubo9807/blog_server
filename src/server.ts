@@ -7,7 +7,7 @@ import chalk from 'chalk';
 import { notify } from 'node-notifier';
 
 import koaStatic from './services/koa-static';
-import proxy from './proxy';
+import proxy from './middleware/proxy';
 import socket from './socket';
 import bodyDispose from './middleware/body-dispose';
 import router from './middleware/router';
