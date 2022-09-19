@@ -40,7 +40,7 @@ export default async(ctx: Context, next: Next) => {
 	}
 
 	const { request_rate } = ctx.state;
-	if (request_rate > 80 && !lock) {  // 请求频率过高，加入黑名单
+	if (request_rate > 60 && !lock) {  // 请求频率过高，加入黑名单
 		lock = true;  // 加锁，防止并发请求次数持续升高
 		await sql_addBlockList(IP, request_rate);
 

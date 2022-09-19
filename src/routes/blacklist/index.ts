@@ -8,7 +8,7 @@ const route = new Router();
 
 // 获取黑名单列表
 route.get('/', async(ctx, next) => {
-  const isPower = await powerDetection(ctx, ['super', 'visitor']);
+  const isPower = await powerDetection(ctx, ['super', 'regulatory']);
   !isPower && throwError(ctx, 405);
   const blacklist = await sql_queryBlockList();
 
@@ -19,7 +19,7 @@ route.get('/', async(ctx, next) => {
 
 // 添加到黑名单
 route.post('/', async(ctx, next) => {
-  const isPower = await powerDetection(ctx, ['super']);
+  const isPower = await powerDetection(ctx, ['super', 'regulatory']);
   !isPower && throwError(ctx, 405);
 
   const { ip } = ctx.request.body;
