@@ -3,6 +3,8 @@ import http from 'http';
 import koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
+import '@/router/config';
+import { routes } from '@/services/koa-router';
 import chalk from 'chalk';
 import { notify } from 'node-notifier';
 
@@ -10,7 +12,6 @@ import koaStatic from './services/koa-static';
 import proxy from './middleware/proxy';
 import socket from './socket';
 import bodyDispose from './middleware/body-dispose';
-import router from './middleware/router';
 import preventDataRefresh from './middleware/prevent-data-refresh';
 import { getIP4Address } from './utils/inspect';
 
@@ -25,11 +26,12 @@ app.use(preventDataRefresh);
 app.use(proxy);
 
 app.use(bodyDispose);
-app.use(router);
+app.use(routes);
 
 socket(server);
 
-app.use(koaStatic(pathConversion()));
+const publicUrl = pathConversion();
+app.use(koaStatic(publicUrl));
 
 // app.use(accessRecord);
 
