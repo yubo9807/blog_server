@@ -36,8 +36,7 @@ export function printErrorLogs(ctx: Context, error: string | Error) {
   const day = dateFormater('YYYY-MM-DD');
 
   const arr = [
-    url, method, getClientIP(ctx), env.NODE_ENV,
-    // '\nParams:', JSON.stringify(query),
+    url, method, getClientIP(ctx),
     '\nData:', JSON.stringify(request.body),
     '\nHeaders:', JSON.stringify(headers),
   ];

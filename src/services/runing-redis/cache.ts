@@ -17,9 +17,9 @@ export default {
 
   /**
    * 设置缓存数据
-   * @param {string | symbol} key 如果不想覆盖此属性，请将 key 设置为 Symbol 类型
-   * @param {*} value 
-   * @param {number} overTime 过期时间，单位（ms）
+   * @param key      如果不想覆盖此属性，请将 key 设置为 Symbol 类型
+   * @param value    储存数据
+   * @param overTime 过期时间，单位（ms）
    */
   set(key: Key, value: Value, overTime: OverTime) {
     if (key === null || key === undefined || key === '') return;
@@ -38,10 +38,10 @@ export default {
    */
   get(key: Key) {
     const value = map.get(key);
-    if (value == null) return;
+    if (value == null) return void 0;
 
     const nowTime = Date.now();
-    (nowTime - value.createTime > value.overTime) && this.delete(key);
+    (nowTime - value.createTime >= value.overTime) && this.delete(key);
     const newValue = map.get(key);
     return newValue && newValue.value;
   },

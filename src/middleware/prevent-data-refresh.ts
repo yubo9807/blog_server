@@ -13,8 +13,10 @@ let lock = false;
 export default async(ctx: Context, next: Next) => {
 
 	const IP = getClientIP(ctx);
-	const key = `blacklist`;
 
+
+	// #region 检查是否在黑名单中
+	const key = `blacklist`;
 	const blackList = await redis.deposit(key, async () => {
 		return await sql_queryBlockList();
 	});
@@ -30,51 +32,61 @@ export default async(ctx: Context, next: Next) => {
 
 		throwError(ctx, 500, `检测到您有恶意攻击行为，已被限制访问。IP： ${IP}`, false);
 	}
+	// #endregion
 
-	const beyond = await requestCount(ctx);
-	if (beyond) {
-		lock && throwError(ctx, 508, null, false);
-	} else {
-		lock = false;  // 请求频次刷新，关闭锁
-		return await next();
-	}
 
-	const { request_rate } = ctx.state;
-	if (request_rate > 60 && !lock) {  // 请求频率过高，加入黑名单
-		lock = true;  // 加锁，防止并发请求次数持续升高
-		await sql_addBlockList(IP, request_rate);
+	// #region 记录请求频率
+	const count = await requestCount(IP);
+	ctx.state.request_rate = count;
 
-		// 覆盖缓存中黑名单数据
-		await redis.deposit(key, async() => {
+	const requestKey = `requestNumber_${IP}`;
+	redis.deposit(requestKey, count, -1, true);
+
+	// 恶意请求，对本机 IP 不做添加
+	if (count > 80 && !lock && !['127.0.0.1', '::1'].includes(IP)) {
+		await sql_addBlockList(IP, count);
+		redis.deposit(key, async() => {
 			return await sql_queryBlockList();
 		}, -1, true);
+
+		lock = true;  // 加锁，只添加一次
+		throwError(ctx, 508);
 	}
-	throwError(ctx, 503, null, false);
+
+	// 请求频次过高，做出警告
+	if (count > 40) {
+		throwError(ctx, 503, null, false);
+	} else {
+		lock = false;
+		return await next();
+	}
+	// #endregion
+
 
 }
 
 
-let requestRate = 1;  // 请求频率
+const countMap = new Map();
 
 /**
  * 请求计数
- * @param ctx 
- * @param time 一定时间内（ms）
- * @param maxRequestNumber 允许最大请求数
+ * @param key  存入数据键
+ * @param time 过期时间
+ * @returns 
  */
-async function requestCount(ctx: Context, time = 5000, maxRequestNumber = 30) {
-	const IP = getClientIP(ctx);
-	const key = `requestNumber_${IP}`
-	const requestStr = await redis.deposit(key, requestRate, time, false, true);
+function requestCount(key: string, time = 5000) {
+  const cache = countMap.get(key);
+  const initial = { value: 1, overTime: Date.now() + time }
 
-	requestRate = requestStr.cache ? requestRate+1 : 1;
-	redis.deposit(key, requestRate, time, true);
+  if (!cache) {
+    countMap.set(key, initial);
+  } else {
+    if (cache.overTime - Date.now() <= 0) {  // 过期
+      countMap.set(key, Object.assign({}, initial));
+    } else {
+      countMap.set(key, Object.assign({}, cache, { value: cache.value + 1 }));
+    }
+  }
 
-  ctx.state.request_rate = requestRate;
-
-	// 请求频率超过了设定值
-	if (requestRate > maxRequestNumber) {
-    return true;
-	}
-  return false;
+  return countMap.get(key).value;
 }

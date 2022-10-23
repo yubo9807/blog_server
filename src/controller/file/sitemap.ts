@@ -15,7 +15,7 @@ export default class {
       
       for await (const attr of fileList) {
         if (attr.isFile) {
-          const str = 'http://hpyyb.cn' + attr.filename.replace(env.BASE_PUBLIC, '').replace(/&/g, '&amp;');
+          const str = 'http://hpyyb.cn' + encodeURI(attr.filename.replace(env.BASE_PUBLIC, '').replace(/&/g, '&amp;'));
           arr.push(`<sitemap>
   <loc>${str}</loc>
   <lastmod>${createTime}</lastmod>

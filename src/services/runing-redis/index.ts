@@ -26,11 +26,11 @@ export default class Redis {
 
   /**
    * 储存数据，如果已经存在并且没有过期你会直接获取到该数据
-   * @param {string} key 设置存放数据的键
-   * @param {*} value 是一个函数时(必须返回数据)：可以进行数据请求，有缓存时并不会执行；其他类型：直接将数据存放进去
-   * @param {date} overTime 过期时间，为 -1 时数据不过期。设置更小的数无意义
-   * @param {boolean} cover 强制覆盖数据
-   * @returns 返回设置的 value
+   * @param key      设置存放数据的键
+   * @param value    是一个函数时(必须返回数据)：可以进行数据请求，有缓存时并不会执行；其他类型：直接将数据存放进去
+   * @param overTime 过期时间，为 -1 时数据不过期。设置更小的数无意义
+   * @param cover    强制覆盖数据
+   * @returns        返回设置的 value
    */
   async deposit(key: Key, value?: Value, overTime: OverTime = -1, cover: Cover = false) {
     if (overTime === -1) overTime = Infinity;  // 设置过期时间正无穷，使数据永久不会过期
@@ -41,16 +41,15 @@ export default class Redis {
       return cache.get(key);
     }
     
-    const data = cache.get(key)
+    const data = cache.get(key);
     if (data) {
       return { cache: true, data };
     } else {
       typeof value === 'function' ? value = await value() : value;
-      cache.set(key, value, overTime);  // 先存数据后清内存，防止溢出
+      cache.set(key, value, overTime);            // 先存数据后清内存，防止溢出
       
-      const size = cache.size();  // 获取容器已存放数据内存大小
-      // 实际缓存的数据比设置缓存数大，进行数据清理
-      size > this.maxCache && this.clearCache();
+      const size = cache.size();                  // 获取容器已存放数据内存大小
+      size > this.maxCache && this.clearCache();  // 实际缓存的数据比设置缓存数大，进行数据清理
       
       return { cache: false, data: value };
     }
@@ -63,9 +62,8 @@ export default class Redis {
    * @returns 
    */
   clearCache() {
-    this.deleteOverValue();  // 清除已过期数据
+    this.deleteOverValue();            // 清除已过期数据
     const size = cache.size();
-
     if (size < this.maxCache) return;  // 再判断一次内存大小
     
     const obj: ItemObj[] = cache.gainAll();
