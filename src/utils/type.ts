@@ -4,11 +4,11 @@ export type AnyObj = {
   [prop: string | number | symbol]: any
 }
 
-export type Type = 'string'    | 'number' | 'boolean' |
-                   'symbol'    | 'bigint' |
-                   'undefined' | 'null'   |
-                   'array'     | 'object' |
-                   'function'  |
+export type Type = 'string'    | 'number'  | 'boolean' |
+                   'symbol'    | 'bigint'  |
+                   'undefined' | 'null'    |
+                   'array'     | 'object'  |
+                   'function'  | 'promise' |
                    'set'       | 'map'
 
 export function isType(o: any): Type {
