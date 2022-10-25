@@ -1,4 +1,4 @@
-import { Router } from '@/services/koa-router';
+import { getRouteList, Router } from '@/services/koa-router';
 
 const route_api = new Router('/api');
 
@@ -62,3 +62,7 @@ route_api.method('GET',  '/file/read/logs',       Logs.read                     
 route_api.method('GET',  '/file/search',          File.search                    );
 route_api.method('POST', '/file/upload/portrait', Portrait.limit, Portrait.upload);
 route_api.method('POST', '/file/write/sitemap',   Sitemap.write                  );
+
+import Interface from '@/controller/interface';
+route_api.noBack();
+route_api.method('GET', '/routes', Interface.gain);
