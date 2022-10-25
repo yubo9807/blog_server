@@ -8,7 +8,7 @@ import { printErrorLogs } from './logger';
  * @param msg 错误消息，500 的时候传
  * @param print 是否打印日志
  */
-export function throwError(ctx: Context, code: number = 500, msg: string = 'business logic error', print = true) {
+export function throwError(ctx: Context, code: number = 500, msg: string = '', print = true) {
 
   if (code === 500 && ['', undefined, null].includes(msg)) {
     throw new Error('param \'msg\' cannot be empty');  // 防止开发者传参导致后面数据返回 code:404
@@ -22,7 +22,7 @@ export function throwError(ctx: Context, code: number = 500, msg: string = 'busi
     403: 'token overdue',  // token 过期
     404: 'invalid url',  // 接口不存在，无效 url
     405: 'power error',  // 当前角色没有权限
-    406: 'params error',  // 传参错误
+    406: msg || 'params error',  // 传参错误
 
     // 5xx 给用户看的错误
     500: msg,  // 业务逻辑错误
