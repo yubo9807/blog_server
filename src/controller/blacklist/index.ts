@@ -12,7 +12,7 @@ export default class {
   /**
    * 获取黑名单列表
    */
-  static async gain(ctx: Context, next: Next) {
+  static async list(ctx: Context, next: Next) {
     const isPower = await powerDetection(ctx, ['super', 'regulatory']);
     !isPower && throwError(ctx, 405);
     const blacklist = await sql_queryBlockList();

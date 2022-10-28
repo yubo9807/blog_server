@@ -6,7 +6,7 @@ export default class {
   /**
    * 获取系统信息
    */
-  static async gain(ctx: Context, next: Next) {
+  static async info(ctx: Context, next: Next) {
   
     const { arch, cpus, hostname, endianness, release, type, uptime, version } = os;
   

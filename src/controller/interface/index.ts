@@ -9,9 +9,14 @@ export default class {
 
     const { pageNumber, pageSize } = check_paging(ctx.query)(ctx);
 
+    const list = getRouteList().filter(val => {
+      if (val.noBack) return false;
+      else return true;
+    });
+
     ctx.body = {
-      list:  getRouteList().splice(pageNumber - 1, pageSize),
-      total: getRouteList().length,
+      list:  Object.assign([], list).splice(pageNumber - 1, pageSize),
+      total: Object.assign([], list).length,
     }
 
     next();

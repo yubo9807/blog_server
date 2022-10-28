@@ -7,7 +7,7 @@ export default class {
   /**
    * 获取所有菜单
    */
-  static async gain(ctx: Context, next: Next) {
+  static async list(ctx: Context, next: Next) {
     ctx.body = await sql_getMenuList();
     await next();
   }

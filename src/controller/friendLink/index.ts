@@ -8,7 +8,7 @@ export default class {
   /**
    * 获取友链列表
    */
-  static async gain(ctx: Context, next: Next) {
+  static async list(ctx: Context, next: Next) {
     ctx.body = await sql_getFriendLinkList();
     await next();
   }

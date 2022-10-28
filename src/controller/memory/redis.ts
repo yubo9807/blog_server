@@ -10,9 +10,9 @@ export default class {
    */
   static async gain(ctx: Context, next: Next) {
     ctx.body = {
-      data: redis.gainAll(),
+      data:   redis.gainAll(),
       length: redis.length(),
-      size: redis.size(),
+      size:   redis.size(),
     };
     await next();
   }

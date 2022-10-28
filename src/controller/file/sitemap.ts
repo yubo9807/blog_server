@@ -6,7 +6,7 @@ import { Context, Next } from 'koa';
 
 export default class {
 
-  static async write(ctx: Context, next: Next) {
+  static async init(ctx: Context, next: Next) {
     const file = new File();
     const createTime = dateFormater('YYYY-MM-DDThh:mm:ssZ', getNowDate() * 1000)
 

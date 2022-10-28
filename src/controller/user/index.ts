@@ -6,7 +6,7 @@ export default class {
   /**
    * 获取用户列表
    */
-  static async gain(ctx: Context, next: Function) {
+  static async list(ctx: Context, next: Function) {
     ctx.body = await sql_getUserList();
     next();
   }
