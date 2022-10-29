@@ -2,9 +2,7 @@ import { sql_addBlockList, sql_deleteBlockList, sql_queryBlockList } from '@/spi
 import { throwError } from '@/services/errorDealWith';
 import { powerDetection } from '@/services/authorization';
 import redis from '@/services/redis';
-import Router from '@koa/router';
 import { Context, Next } from 'koa';
-const route = new Router();
 
 
 export default class {
@@ -22,7 +20,7 @@ export default class {
   }
 
   /**
-   * 获取到黑名单列表
+   * 添加到黑名单列表
    */
   static async add(ctx: Context, next: Next) {
     const isPower = await powerDetection(ctx, ['super', 'regulatory']);
