@@ -1,6 +1,6 @@
 import path from 'path';
 import moduleAlias from 'module-alias';
-import { BASE_API } from '@/constant/route';
+import { BASE_API } from './constant/route';
 
 export const DEVELOPMENT = 'development';
 export const PRODUCTION  = 'production';

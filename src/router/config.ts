@@ -7,7 +7,8 @@ const route_api = new Router(BASE_API);
 
 // 访问记录
 import Access from '@/controller/access';
-route_api.get('/access', Access.gain).exec();
+route_api.get('/access', Access.gain, Access.paging).exec();
+route_api.get('/access/chart', Access.gain, Access.statistical).exec();
 route_api.post('/access', authorization(SUPER), Access.write).exec();
 
 // 黑名单
@@ -24,7 +25,7 @@ route_api.put('/friendLink', authorization(SUPER), FriendLink.modify).exec();
 
 // redis
 import Redis from '@/controller/memory/redis';
-route_api.get('/memory/redis', Redis.gain ).exec();
+route_api.get('/memory/redis', Redis.gain).exec();
 route_api.delete('/memory/redis', authorization(SUPER), Redis.clear).exec();
 
 // 菜单

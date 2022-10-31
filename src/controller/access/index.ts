@@ -4,12 +4,14 @@ import File from '@/utils/file';
 import { pathConversion } from '@/env';
 import { createAccessRecord } from '@/middleware/access-record';
 import { Context, Next } from 'koa';
+import { check_paging } from '@/common/check';
 
 const file = new File();
 const baseFilename = pathConversion('/access');
 
 export default class {
 
+  // #region 获取访问记录
   /**
    * 获取访问记录
    */
@@ -49,6 +51,41 @@ export default class {
     ctx.body = list;
     next();
   }
+
+  /**
+   * 对获取到的访问数据进行分页
+   */
+  static paging(ctx: Context, next: Next) {
+    const { pageNumber, pageSize } = check_paging(ctx.query)(ctx);
+
+    const list = ctx.body;
+    ctx.body = {
+      list:   Object.assign([], list).splice(pageNumber - 1, pageSize),
+      length: Object.assign([], list).length,
+    }
+
+    next();
+  }
+
+  /**
+   * 对获取到的访问数据生成统计数据
+   */
+  static statistical(ctx: Context, next: Next) {
+    const list = ctx.body;
+
+    const obj = {};
+    (list as any[]).forEach(val => {
+      const key = dateFormater('MM-DD', val.accessTime * 1000);
+      !obj[key] && (obj[key] = 0);
+      obj[key] = obj[key] + 1;
+    })
+
+    ctx.body = obj;
+    next();
+  }
+  // #endregion
+
+
 
   /**
    * 写入访问记录
