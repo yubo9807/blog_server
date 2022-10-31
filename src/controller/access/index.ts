@@ -1,5 +1,5 @@
 import { throwError } from '@/services/errorDealWith';
-import { dateFormater, getNowDate } from '@/utils/date';
+import { dateFormater, getNowDate, getNowDayZeroTimestamp } from '@/utils/date';
 import File from '@/utils/file';
 import { pathConversion } from '@/env';
 import { createAccessRecord } from '@/middleware/access-record';
@@ -71,11 +71,24 @@ export default class {
    * 对获取到的访问数据生成统计数据
    */
   static statistical(ctx: Context, next: Next) {
-    const list = ctx.body;
+    const list = (ctx.body as any[]);
 
-    const obj = {};
-    (list as any[]).forEach(val => {
-      const key = dateFormater('MM-DD', val.accessTime * 1000);
+    const dayDuration  = 1000 * 60 * 60 * 24;
+
+    const startTime: any = ctx.query.startTime || (list[0] && list[0].accessTime - 60*60*24) || getNowDayZeroTimestamp();
+    const endTime: any   = ctx.query.endTime || getNowDate();
+    const cycle          = Math.trunc((endTime - startTime) / 60 / 60 / 24);
+    const obj            = {};
+
+    // 给这个周期内所有天数设置默认访问数量 0
+    for (let i = cycle; i >= 0; i--) {
+      const date = new Date(endTime * 1000 - dayDuration * i);
+      const key  = dateFormater('YYYY-MM-DD', date);
+      obj[key]   = 0;
+    }
+
+    list.forEach(val => {
+      const key = dateFormater('YYYY-MM-DD', val.accessTime * 1000);
       !obj[key] && (obj[key] = 0);
       obj[key] = obj[key] + 1;
     })

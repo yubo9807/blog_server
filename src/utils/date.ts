@@ -1,12 +1,17 @@
+/**
+ * 获取时间戳（10位）
+ * @param timestamp 
+ * @returns 
+ */
 export function getNowDate(timestamp: Date | number = Date.now()) {
-  return parseInt(String(new Date(timestamp).getTime() / 1000));
+  return Math.trunc(new Date(timestamp).getTime() / 1000);
 }
 
 /**
  * 获取当前时间
  * @param t 
  */
- export const getCurrentDate = (t: string | number | Date) => {
+export const getCurrentDate = (t: string | number | Date) => {
   let date = t ? new Date(t) : new Date();
   return {
       year: date.getFullYear() + '',
@@ -23,7 +28,7 @@ export function getNowDate(timestamp: Date | number = Date.now()) {
  * @param formater 
  * @param t 
  */
- export const dateFormater = (formater: string = 'YYYY-MM-DD hh:mm:ss', t: string | number | Date = new Date()) => {
+export const dateFormater = (formater: string = 'YYYY-MM-DD hh:mm:ss', t: string | number | Date = new Date()) => {
   const {year, month, day, hour, minute, second} = getCurrentDate(t);
   return formater.replace(/YYYY/g, year)
   .replace(/YY/g, year.substr(2, 2))
@@ -61,4 +66,12 @@ export function getMonthDays(time: string | null = null) {
   const month = date.getMonth() + 1;
   const d = new Date(year, month, 0);
   return d.getDate();
+}
+
+/**
+ * 获取当天 0 点的时间戳（10位）
+ */
+export function getNowDayZeroTimestamp(t: Date | number = Date.now()) {
+  const time = new Date(new Date(t).toDateString()).getTime();
+  return Math.trunc(time / 1000);
 }
