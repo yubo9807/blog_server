@@ -4,6 +4,7 @@ import redis from "@/services/redis";
 import { sql_addBlockList, sql_queryBlockList } from "@/spider/blacklist";
 import { getClientIP } from "@/utils/network";
 import { Context, Next } from "koa";
+import { SUPER } from '@/constant/role'
 
 let lock = false;
 
@@ -28,7 +29,7 @@ export default async(ctx: Context, next: Next) => {
 
 		// 不对超管访问进行限制
 		const user = await getAuthorization(ctx, false);
-		if (user && user.role === 'super') return;
+		if (user && user.role === SUPER) return;
 
 		throwError(ctx, 500, `检测到您有恶意攻击行为，已被限制访问。IP： ${IP}`, false);
 	}

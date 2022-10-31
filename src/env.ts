@@ -1,10 +1,9 @@
 import path from 'path';
 import moduleAlias from 'module-alias';
+import { BASE_API } from '@/constant/route';
 
 export const DEVELOPMENT = 'development';
 export const PRODUCTION  = 'production';
-
-const BASEAPI = '/api';
 
 // 生产环境
 let env = {
@@ -17,9 +16,9 @@ let env = {
 
   BASE_URL: path.resolve(__dirname),
 
-  BASE_API: BASEAPI,
+  BASE_API,
 
-  BASE_SOCKET: BASEAPI + '/socket',
+  BASE_SOCKET: BASE_API + '/socket',
 
   CORS_ORIGIN: 'http://hpyyb.cn',  // 允许访问IP
 
@@ -39,7 +38,7 @@ moduleAlias.addAliases({
   '~': env.BASE_ROOT
 })
 
-export default env;
+export default Object.freeze(env);
 
 /**
  * 拼接静态资源目录

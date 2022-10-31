@@ -1,6 +1,5 @@
 import { sql_getFriendLinkList, sql_addFriendLink, sql_deleteFriendLink, sql_modifyFriendLink } from '../../spider/friendLink';
 import { throwError } from '../../services/errorDealWith';
-import { powerDetection } from '@/services/authorization';
 import { Context, Next } from 'koa';
 
 export default class {
@@ -13,10 +12,10 @@ export default class {
     await next();
   }
 
+  /**
+   * 删除友链
+   */
   static async delete(ctx: Context, next: Next) {
-    const isPower = await powerDetection(ctx, ['super']);
-    !isPower && throwError(ctx, 405);
-  
     const { id } = ctx.request.body;
     if (!id) {
       throwError(ctx, 406, 'params error');
@@ -29,9 +28,6 @@ export default class {
    * 添加友链
    */
   static async add(ctx: Context, next: Next) {
-    const isPower = await powerDetection(ctx, ['super']);
-    !isPower && throwError(ctx, 405);
-  
     const { name, link, remark } = ctx.request.body;
     if (!name || !link) {
       throwError(ctx, 406, 'params error');
@@ -45,9 +41,6 @@ export default class {
    * 修改友链
    */
   static async modify(ctx: Context, next: Next) {
-    const isPower = await powerDetection(ctx, ['super']);
-    !isPower && throwError(ctx, 405);
-  
     const { id, name, link, remark } = ctx.request.body;
     const params = {
       id,

@@ -1,6 +1,5 @@
 import { sql_addBlockList, sql_deleteBlockList, sql_queryBlockList } from '@/spider/blacklist';
 import { throwError } from '@/services/errorDealWith';
-import { powerDetection } from '@/services/authorization';
 import redis from '@/services/redis';
 import { Context, Next } from 'koa';
 
@@ -11,8 +10,6 @@ export default class {
    * 获取黑名单列表
    */
   static async list(ctx: Context, next: Next) {
-    const isPower = await powerDetection(ctx, ['super', 'regulatory']);
-    !isPower && throwError(ctx, 405);
     const blacklist = await sql_queryBlockList();
 
     ctx.body = blacklist;
@@ -23,9 +20,6 @@ export default class {
    * 添加到黑名单列表
    */
   static async add(ctx: Context, next: Next) {
-    const isPower = await powerDetection(ctx, ['super', 'regulatory']);
-    !isPower && throwError(ctx, 405);
-  
     const { ip } = ctx.request.body;
     if (!ip) throwError(ctx, 406);
   
@@ -46,9 +40,6 @@ export default class {
    * 从黑名单列表中删除
    */
   static async delete(ctx: Context, next: Next) {
-    const isPower = await powerDetection(ctx, ['super']);
-    !isPower && throwError(ctx, 405);
-  
     const { id } = ctx.request.body;
     if (!id) throwError(ctx, 406);
   
