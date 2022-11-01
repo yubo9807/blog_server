@@ -1,22 +1,24 @@
 import cache, { Key, Value, OverTime, Count } from './cache';
 
-type CreateTime = number
+type CreateTime   = number
 export type Cover = boolean
+
 type ItemObj = {
   createTime: CreateTime,
-  value: Value,
-  overTime: OverTime,
-  count: Count
+  value:      Value,
+  overTime:   OverTime,
+  count:      Count
 }
 type SortArr = {
-  key: Key,
+  key:        Key,
   createTime: CreateTime,
-  value: Value,
-  overTime: OverTime,
-  count: Count
+  value:      Value,
+  overTime:   OverTime,
+  count:      Count
 }
 
 export default class Redis {
+
   maxCache: number
   constructor(maxCache = 1024 * 1024 * 2) {
     this.maxCache = maxCache;  // 最大缓存数
@@ -84,12 +86,12 @@ export default class Redis {
   deleteOverValue() {
     const obj: ItemObj[]  = cache.gainAll();
     const curTime = Date.now();
+
     for (const prop of Object.entries(obj)) {
       const createTime = prop[1].createTime;
-      const overTime = prop[1].overTime;
-      if (curTime - createTime > overTime) {
-        cache.delete(prop[0]);
-      }
+      const overTime   = prop[1].overTime;
+
+      curTime - createTime > overTime && cache.delete(prop[0]);
     }
   }
 
@@ -102,11 +104,11 @@ export default class Redis {
    */
   deleteFristValue(arr: SortArr[]) {
     const key = arr[0].key;
+
     arr.shift();
     cache.delete(key);
 
-    const size = cache.size();
-    if (size <= this.maxCache) return;
+    if (cache.size() <= this.maxCache) return;
     this.deleteFristValue(arr);  // 如果容器内存依然大于设定内存，继续删
   }
 

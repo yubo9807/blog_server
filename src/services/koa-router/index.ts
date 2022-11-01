@@ -87,6 +87,11 @@ export class Router {
    */
   redirect(path: string) {
     this.#currentRedirect = path;
+    performQueue.push({
+      method:     this.#currentMethod,
+      path:       this.#currentPath,
+      middleware: (ctx, next) => { ctx.redirect(this.prefix + path) },
+    });
     return this;
   }
 
@@ -112,7 +117,7 @@ export class Router {
         state:      this.#currentState,
         path:       this.prefix + (this.#currentRedirect || this.#currentPath),
         originPath: this.#currentRedirect && this.prefix + this.#currentPath,
-      })
+      });
     })
     this.#restore();
   }
@@ -135,7 +140,7 @@ export function getRouteList() {
     // 只返回有用的数据
     const { middleware, state, ...args } = val;
     list.push({ ...state, ...args });
-  })
+  });
   return list;
 }
 

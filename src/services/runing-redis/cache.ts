@@ -1,13 +1,13 @@
 
 import { createNum } from '@/utils/number';
 
-export type Key = string | symbol
-export type Value = any
+export type Key      = string | symbol
+export type Value    = any
 export type OverTime = any
-export type Count = number
+export type Count    = number
 
 const iter = createNum();  // 数字生成器
-const map = new Map();  // 禁止导出，防止外部拿到直接修改内部数据
+const map  = new Map();    // 禁止导出，防止外部拿到直接修改内部数据
 
 /**
  * 默认导出一些对数据操作的方法
@@ -25,9 +25,9 @@ export default {
     if (key === null || key === undefined || key === '') return;
     map.set(key, {
       createTime: Date.now(),
-      value,
-      overTime: overTime,
-      count: iter.next().value,  // 同一毫秒内可能存很多数据，记录一个索引，越小则证明存放时间越早
+      value       ,
+      overTime:   overTime,
+      count:      iter.next().value,  // 同一毫秒内可能存很多数据，记录一个索引，越小则证明存放时间越早
     })
   },
 

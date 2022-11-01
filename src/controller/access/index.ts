@@ -60,8 +60,8 @@ export default class {
 
     const list = ctx.body;
     ctx.body = {
-      list:   Object.assign([], list).splice(pageNumber - 1, pageSize),
-      length: Object.assign([], list).length,
+      list:  Object.assign([], list).splice(pageNumber - 1, pageSize),
+      total: Object.assign([], list).length,
     }
 
     next();

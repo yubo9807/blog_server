@@ -18,7 +18,7 @@ export default (...roles: power[]) => {
     err && throwError(ctx, 403);
 
     if (res && roles.includes(res.role)) {
-      next();
+      await next();
     } else {
       throwError(ctx, 405);
     }
