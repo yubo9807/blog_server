@@ -7,7 +7,7 @@ const route_api = new Router(BASE_API);
 
 // 访问记录
 import Access from '@/controller/access';
-route_api.get('/access', Access.gain, Access.paging).exec();
+route_api.get('/access', Access.gain, Access.filter, Access.paging).exec();
 route_api.get('/access/chart', Access.gain, Access.statistical).exec();
 route_api.post('/access', authorization(SUPER), Access.write).exec();
 

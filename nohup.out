@@ -1,0 +1,19 @@
+nohup: ./dist/server.js: Permission denied
+
+> server_ts@1.0.0 start /Users/yubo/Desktop/blog/server/nodejs
+> node dist/server.js
+
+(node:64230) [DEP0025] DeprecationWarning: sys is deprecated. Use util instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+本地：http://localhost:20010/api
+IP4： http://10.0.26.175:20010/api
+Tue, 15 Nov 2022 05:59:23 GMT http-errors deprecated non-error status code; use only 4xx or 5xx status codes at node_modules/koa/lib/context.js:97:11
+
+> server_ts@1.0.0 start /Users/yubo/Desktop/blog/server/nodejs
+> node dist/server.js
+
+(node:64292) [DEP0025] DeprecationWarning: sys is deprecated. Use util instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+本地：http://localhost:20010/api
+IP4： http://10.0.26.175:20010/api
+Tue, 15 Nov 2022 06:03:54 GMT http-errors deprecated non-error status code; use only 4xx or 5xx status codes at node_modules/koa/lib/context.js:97:11

@@ -47,9 +47,21 @@ export default class {
         if (val.accessTime >= start && val.accessTime < end) return val;
       })
     }
-    
-    ctx.body = list;
+
+    ctx.body = list.reverse();
     next();
+  }
+
+  static async filter(ctx: Context, next: Next) {
+    const ip  = ctx.query.ip || '';
+    const url = ctx.query.url || '';
+    const list = (ctx.body as any[]).filter(val => {
+      val.ip  ||= '';
+      val.url ||= '';
+      if (val.ip.includes(ip) && val.url.includes(url)) return true;
+    })
+    ctx.body = list;
+    await next();
   }
 
   /**
